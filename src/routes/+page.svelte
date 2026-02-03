@@ -146,6 +146,7 @@
         width: 100%;
         min-height: 60px;
         box-sizing: border-box;
+        font-size: 16px;
     }
 
     .prompt {
