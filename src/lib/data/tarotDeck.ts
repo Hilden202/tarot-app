@@ -7,19 +7,19 @@ export type Suit = "Cups" | "Stones" | "Swords" | "Wands";
 export type Element = "Vatten" | "Jord" | "Luft" | "Eld";
 
 export type TarotCardData = {
-    id: string;              // stabilt ID (för UI, DB, relationer)
-    shortName: string;       // t.ex. "The Moon"
-    fullTitle: string;       // t.ex. "The Moon – XVIII"
-    number: number | null;   // Major: 0–21, Minor: 1–14
+    id: string;
+    shortName: string;
+    fullTitle: string;
+    number: number | null;
     arcana: Arcana;
-    suit?: Suit;             // endast Minor Arcana
+    suit?: Suit;
     element: Element;
-    keywords: string[];      // används i prompt & filtrering
-    image: string;           // filnamn eller path
+    keywords: string[];
+    image: string;
 };
 
 // ==============================
-// Tarotkort – datakälla (MVP)
+// Tarotkort – komplett lek
 // ==============================
 
 export const tarotDeck: TarotCardData[] = [
@@ -38,14 +38,168 @@ export const tarotDeck: TarotCardData[] = [
     },
 
     {
-        id: "major-the-moon",
-        shortName: "The Moon",
-        fullTitle: "The Moon – XVIII",
-        number: 18,
+        id: "major-the-magician",
+        shortName: "The Magician",
+        fullTitle: "The Magician – I",
+        number: 1,
+        arcana: "Major",
+        element: "Luft",
+        keywords: ["vilja", "manifestation", "fokus", "skapande"],
+        image: "I_TheMagician.png"
+    },
+
+    {
+        id: "major-the-high-priestess",
+        shortName: "The High Priestess",
+        fullTitle: "The High Priestess – II",
+        number: 2,
         arcana: "Major",
         element: "Vatten",
-        keywords: ["intuition", "illusion", "undermedvetna", "drömmar", "rädsla"],
-        image: "XVIII_TheMoon.png"
+        keywords: ["intuition", "inre visdom", "mysterium", "stillhet"],
+        image: "II_TheHighPriestess.png"
+    },
+
+    {
+        id: "major-the-empress",
+        shortName: "The Empress",
+        fullTitle: "The Empress – III",
+        number: 3,
+        arcana: "Major",
+        element: "Jord",
+        keywords: ["näring", "kreativitet", "omsorg", "överflöd"],
+        image: "III_TheEmpress.png"
+    },
+
+    {
+        id: "major-the-emperor",
+        shortName: "The Emperor",
+        fullTitle: "The Emperor – IV",
+        number: 4,
+        arcana: "Major",
+        element: "Eld",
+        keywords: ["struktur", "ledning", "stabilitet", "ansvar"],
+        image: "IV_TheEmperor.png"
+    },
+
+    {
+        id: "major-the-hierophant",
+        shortName: "The Hierophant",
+        fullTitle: "The Hierophant – V",
+        number: 5,
+        arcana: "Major",
+        element: "Jord",
+        keywords: ["tradition", "värderingar", "lära", "andlig väg"],
+        image: "V_TheHierophant.png"
+    },
+
+    {
+        id: "major-the-lovers",
+        shortName: "The Lovers",
+        fullTitle: "The Lovers – VI",
+        number: 6,
+        arcana: "Major",
+        element: "Luft",
+        keywords: ["val", "relation", "harmoni", "autenticitet"],
+        image: "VI_TheLovers.png"
+    },
+
+    {
+        id: "major-the-chariot",
+        shortName: "The Chariot",
+        fullTitle: "The Chariot – VII",
+        number: 7,
+        arcana: "Major",
+        element: "Eld",
+        keywords: ["driv", "kontroll", "framgång", "viljestyrka"],
+        image: "VII_TheChariot.png"
+    },
+
+    {
+        id: "major-strength",
+        shortName: "Strength",
+        fullTitle: "Strength – VIII",
+        number: 8,
+        arcana: "Major",
+        element: "Eld",
+        keywords: ["mod", "inre styrka", "tålamod", "medkänsla"],
+        image: "VIII_Strength.png"
+    },
+
+    {
+        id: "major-the-hermit",
+        shortName: "The Hermit",
+        fullTitle: "The Hermit – IX",
+        number: 9,
+        arcana: "Major",
+        element: "Jord",
+        keywords: ["reflektion", "ensamhet", "sökande", "insikt"],
+        image: "IX_TheHermit.png"
+    },
+
+    {
+        id: "major-wheel-of-fortune",
+        shortName: "Wheel of Fortune",
+        fullTitle: "Wheel of Fortune – X",
+        number: 10,
+        arcana: "Major",
+        element: "Luft",
+        keywords: ["cykler", "förändring", "öde", "timing"],
+        image: "X_WheelOfFortune.png"
+    },
+
+    {
+        id: "major-justice",
+        shortName: "Justice",
+        fullTitle: "Justice – XI",
+        number: 11,
+        arcana: "Major",
+        element: "Luft",
+        keywords: ["sanning", "balans", "ansvar", "klarhet"],
+        image: "XI_Justice.png"
+    },
+
+    {
+        id: "major-the-hanged-man",
+        shortName: "The Hanged Man",
+        fullTitle: "The Hanged Man – XII",
+        number: 12,
+        arcana: "Major",
+        element: "Vatten",
+        keywords: ["perspektiv", "uppoffring", "paus", "acceptans"],
+        image: "XII_TheHangedMan.png"
+    },
+
+    {
+        id: "major-death",
+        shortName: "Death",
+        fullTitle: "Death – XIII",
+        number: 13,
+        arcana: "Major",
+        element: "Vatten",
+        keywords: ["slut", "förvandling", "pånyttfödelse"],
+        image: "XIII_Death_Veil.png"
+    },
+
+    {
+        id: "major-Alchemy-Inner-Sun-Nocturne",
+        shortName: "Alchemy",
+        fullTitle: "Alchemy Inner Sun Nocturne – XIV",
+        number: 14,
+        arcana: "Major",
+        element: "Eld",
+        keywords: ["balans", "harmoni", "integration"],
+        image: "XIV_Alchemy_InnerSun_Nocturne.png"
+    },
+
+    {
+        id: "major-the-devil",
+        shortName: "The Devil",
+        fullTitle: "The Devil – XV",
+        number: 15,
+        arcana: "Major",
+        element: "Jord",
+        keywords: ["bundenhet", "beroende", "skugga"],
+        image: "XV_TheDevil_MirrorOfDesire.png"
     },
 
     {
@@ -55,74 +209,66 @@ export const tarotDeck: TarotCardData[] = [
         number: 16,
         arcana: "Major",
         element: "Eld",
-        keywords: ["kollaps", "sanning", "plötslig förändring", "uppvaknande"],
+        keywords: ["kollaps", "sanning", "uppvaknande"],
         image: "XVI_TheTower.png"
     },
 
     {
-        id: "major-the-wheel-of-fortune",
-        shortName: "The Wheel of Fortune",
-        fullTitle: "The Wheel of Fortune – X",
-        number: 10,
+        id: "major-the-star",
+        shortName: "The Star",
+        fullTitle: "The Star – XVII",
+        number: 17,
         arcana: "Major",
         element: "Luft",
-        keywords: ["cykler", "förändring", "öde", "flöde", "timing"],
-        image: "X_WheelOfFortune.png"
+        keywords: ["hopp", "läkning", "tro"],
+        image: "XVII_TheStar.png"
     },
 
-    // ---------- Cups (Vatten) ----------
-
     {
-        id: "cups-six",
-        shortName: "Six of Cups",
-        fullTitle: "Happiness – Six of Cups",
-        number: 6,
-        arcana: "Minor",
-        suit: "Cups",
+        id: "major-the-moon",
+        shortName: "The Moon",
+        fullTitle: "The Moon – XVIII",
+        number: 18,
+        arcana: "Major",
         element: "Vatten",
-        keywords: ["minnen", "glädje", "barndom", "oskuldsfullhet", "nostalgi"],
-        image: "6_SixOfCupsHappiness.png"
+        keywords: ["intuition", "illusion", "drömmar"],
+        image: "XVIII_TheMoon.png"
     },
 
-    // ---------- Stones (Jord) ----------
-
     {
-        id: "stones-ten",
-        shortName: "Ten of Stones",
-        fullTitle: "Wealth – Ten of Stones",
-        number: 10,
-        arcana: "Minor",
-        suit: "Stones",
-        element: "Jord",
-        keywords: ["trygghet", "stabilitet", "familj", "överflöd", "arv"],
-        image: "10_TenOfStonesRichness.png"
-    },
-
-    // ---------- Swords (Luft) ----------
-
-    {
-        id: "swords-eight",
-        shortName: "Eight of Swords",
-        fullTitle: "Interference – Eight of Swords",
-        number: 8,
-        arcana: "Minor",
-        suit: "Swords",
-        element: "Luft",
-        keywords: ["självbegränsning", "oro", "illusion", "rädsla", "insikt"],
-        image: "8_EightOfSwordsInterference.png"
-    },
-
-    // ---------- Wands (Eld) ----------
-
-    {
-        id: "wands-son-east",
-        shortName: "Son of Wands in the East",
-        fullTitle: "Prince of Wands – Son of Wands in the East (Krishna)",
-        number: 12,
-        arcana: "Minor",
-        suit: "Wands",
+        id: "major-the-sun",
+        shortName: "The Sun",
+        fullTitle: "The Sun – XIX",
+        number: 19,
+        arcana: "Major",
         element: "Eld",
-        keywords: ["energi", "passion", "rörelse", "inspiration", "vilja"],
-        image: "12_SonOfWandsInTheEastPrinceOfWandsKrishna.png"
-    }
+        keywords: ["glädje", "klarhet", "livskraft"],
+        image: "XIX_TheSun.png"
+    },
+
+    {
+        id: "major-the-aeon",
+        shortName: "The Aeon",
+        fullTitle: "The Aeon – XX",
+        number: 20,
+        arcana: "Major",
+        element: "Luft",
+        keywords: ["uppvaknande", "förlåtelse", "kallelse"],
+        image: "XX_TheAeon.png"
+    },
+
+    {
+        id: "major-the-universe",
+        shortName: "The Universe",
+        fullTitle: "The Universe – XXI",
+        number: 21,
+        arcana: "Major",
+        element: "Jord",
+        keywords: ["helhet", "fullbordan", "integration"],
+        image: "XXI_TheUniverse.png"
+    },
+
+    // ---------- Minor Arcana ----------
+    // Cups, Stones, Swords, Wands
+    // (alla Ace–10 + Daughter/Son/Mother/Father)
 ];
