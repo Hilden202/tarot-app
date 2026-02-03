@@ -113,6 +113,7 @@
         display: flex;
         justify-content: center;
         gap: 1.5rem;
+        flex-wrap: wrap;
     }
 
     .controls {
@@ -122,19 +123,40 @@
         gap: 1rem;
     }
 
-    .question {
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
+    @media (max-width: 600px) {
+        .controls {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .controls button {
+            width: 100%;
+            max-width: 420px;
+            align-self: center;
+        }
     }
 
+    .question {
+        width: 100%;
+        max-width: 420px;
+    }
+
+
     .question textarea {
-        min-width: 280px;
+        width: 100%;
         min-height: 60px;
+        box-sizing: border-box;
     }
 
     .prompt {
         display: flex;
         justify-content: center;
     }
+    
+    @media (max-width: 600px) {
+        .cards {
+            gap: 1rem;
+        }
+    }
+
 </style>

@@ -44,14 +44,21 @@
 <style lang="scss">
 
   .card {
-    width: 230px;
-    height: 345px;
+    width: min(28vw, 230px);   /* desktop */
+    aspect-ratio: 2 / 3;      /* ersätter height */
     position: relative;
     perspective: 1000px;
     background: none;
     border: none;
     padding: 0;
     cursor: pointer;
+  }
+
+  @media (max-width: 600px) {
+    .card {
+      width: 80vw;
+      max-width: 260px;
+    }
   }
 
   .card > div {
