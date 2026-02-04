@@ -67,9 +67,20 @@
 
 <div class="app">
     <header class="header">
-        <h1>Tarot app</h1>
-        <p>{flippedIds.size} / {selectedCards.length} kort uppvända</p>
+        <h1>Tarotläggning</h1>
+
+        {#if !hasDrawn}
+            <p class="intro">
+                Ta ett ögonblick, formulera en fråga och dra dina kort.
+            </p>
+        {/if}
     </header>
+
+    {#if hasDrawn}
+        <p class="progress">
+            {flippedIds.size} / {selectedCards.length} kort uppvända
+        </p>
+    {/if}
 
     <section class="cards">
         {#each selectedCards as card (`${drawId}-${card.id}`)}
@@ -140,6 +151,13 @@
 </div>
 
 <style>
+    .progress {
+        text-align: center;
+        font-size: 0.85rem;
+        color: #888;
+        margin-bottom: 1rem;        
+    }
+
     .app {
         max-width: 900px;
         margin: 0 auto;
@@ -151,6 +169,13 @@
 
     .header {
         text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .header h1 {
+        font-size: 1.8rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
     }
 
     .cards {
