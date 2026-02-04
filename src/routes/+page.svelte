@@ -2,6 +2,7 @@
     import TarotCard from "$lib/components/TarotCard.svelte";
     import TarotPrompt from "$lib/components/TarotPrompt.svelte";
     import {tarotDeck} from "$lib/data/tarotDeck";
+    import Button from "$lib/components/Button.svelte";
     import type {TarotCardData} from "$lib/data/tarotDeck";
 
     let selectedCards: TarotCardData[] = [];
@@ -111,18 +112,19 @@
         </div>
 
         {#if !hasDrawn}
-            <button
+            <Button
                     on:click={newCards}
                     disabled={!question.trim()}
             >
                 Dra {cardCount} kort
-            </button>
+            </Button>
         {:else}
-            <button
+            <Button
+                    variant="ghost"
                     on:click={resetDraw}
             >
                 Ny dragning
-            </button>
+            </Button>
         {/if}
 
     </section>
