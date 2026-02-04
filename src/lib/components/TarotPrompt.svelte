@@ -1,5 +1,6 @@
 ﻿<script lang="ts">
-    import type { TarotCardData } from "$lib/data/tarotDeck";
+    import type {TarotCardData} from "$lib/data/tarotDeck";
+
     export let cards: TarotCardData[];
     export let question: string;
 
@@ -14,25 +15,37 @@
         }, 2000);
     }
 
-   $: promptText = `Tarotläggning – tolkning önskas
+    function getInterpretationFrame(cardCount: number) {
+        if (cardCount === 1) {
+            return `Tolka detta kort som ett övergripande budskap kopplat till frågan.
+Fokusera på insikt, riktning och medvetenhet snarare än detaljer eller förutsägelser.`;
+        }
+
+        if (cardCount === 2) {
+            return `Tolka korten som två perspektiv som belyser frågan från olika håll.
+Fokusera på hur de samspelar, kontrasterar eller kompletterar varandra.`;
+        }
+
+        // default: 3-korts vägledning
+        return `Tolka tarotläggningen som en helhet, inte enbart kort för kort.
+Fokusera på det övergripande temat, hur korten samspelar och vilken vägledning som är relevant för frågan.`;
+    }
+
+    $: promptText = `Tarotläggning – tolkning önskas
 
 Jag har ställt följande fråga:
 "${question}"
 
-Jag drog ${cards.length} tarotkort, som vändes ett i taget:
+Jag drog ${cards.length} tarotkort:
 ${cards.map(c => `- ${c.fullTitle}`).join("\n")}
 
-Tolka denna tarotläggning som en helhet, inte enbart kort för kort.
-Fokusera på:
-- det övergripande temat eller budskapet
-- hur korten samspelar med varandra
-- vilken vägledning eller insikt som är relevant för min fråga
+${getInterpretationFrame(cards.length)}
 
 Tolkningen ska vara reflekterande, jordnära och stödjande –
 inte förutsägande eller absolut.
 
 Avsluta med en kort sammanfattning av kärnbudskapet.`;
-    
+
 </script>
 
 

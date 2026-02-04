@@ -13,6 +13,17 @@
 
     let drawId = 0;
 
+    let cardCount = 3;
+
+    let hasDrawn = false
+
+    function resetDraw() {
+        selectedCards = [];
+        flippedIds = new Set<string>();
+        question = "";
+        hasDrawn = false;
+    }
+
     function handleFlipChange(payload: { id: string; isFlipped: boolean }) {
         const next = new Set(flippedIds);
 
@@ -38,7 +49,7 @@
         const deckCopy = [...tarotDeck];
         const returnSelected: TarotCardData[] = [];
 
-        while (returnSelected.length < 3 && deckCopy.length > 0) {
+        while (returnSelected.length < cardCount && deckCopy.length > 0) {
             const randomIndex = Math.floor(Math.random() * deckCopy.length);
 
             // plocka kortet
@@ -49,8 +60,8 @@
         }
         // ersätt
         selectedCards = returnSelected;
+        hasDrawn = true;
     }
-
 </script>
 
 <div class="app">
@@ -69,20 +80,51 @@
     </section>
 
     <section class="controls">
-        <label class="question">
-            <span>Din fråga:</span>
-            <textarea
-                    bind:value={question}
-                    placeholder="Vad vill du få vägledning kring just nu?"
-            />
-        </label>
+        <div class="question">
+            {#if !hasDrawn}
+                <div class="card-count">
+                    <label>
+                        <input type="radio" bind:group={cardCount} value={1}/>
+                        1 kort
+                    </label>
 
-        <button
-                on:click={newCards}
-                disabled={!question.trim()}
-        >
-            Dra 3 kort
-        </button>
+                    <label>
+                        <input type="radio" bind:group={cardCount} value={2}/>
+                        2 kort
+                    </label>
+
+                    <label>
+                        <input type="radio" bind:group={cardCount} value={3}/>
+                        3 kort
+                    </label>
+                </div>
+            {/if}
+
+            <label>
+                <span>Din fråga:</span>
+                <textarea
+                        bind:value={question}
+                        placeholder="Vad vill du få vägledning kring just nu?"
+                        disabled={hasDrawn}
+                />
+            </label>
+        </div>
+
+        {#if !hasDrawn}
+            <button
+                    on:click={newCards}
+                    disabled={!question.trim()}
+            >
+                Dra {cardCount} kort
+            </button>
+        {:else}
+            <button
+                    on:click={resetDraw}
+            >
+                Ny dragning
+            </button>
+        {/if}
+
     </section>
 
     {#if allCardsFlipped}
@@ -114,6 +156,19 @@
         justify-content: center;
         gap: 1.5rem;
         flex-wrap: wrap;
+    }
+
+    .card-count {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+
+    .card-count label {
+        display: flex;
+        gap: 0.25rem;
+        align-items: center;
+        font-size: 0.9rem;
     }
 
     .controls {
@@ -153,7 +208,7 @@
         display: flex;
         justify-content: center;
     }
-    
+
     @media (max-width: 600px) {
         .cards {
             gap: 1rem;
