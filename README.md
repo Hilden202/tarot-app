@@ -4,10 +4,11 @@
 
 A small SvelteKit-based tarot app MVP.
 
-- Draw 3 tarot cards
+- Draw 1–3 tarot cards
 - Flip cards individually
-- Enter a question
+- Enter a question before drawing
 - Generate an AI-ready tarot interpretation prompt
 - Copy prompt to clipboard
 
-Built as a learning project focused on clean structure and frontend flow.
+Built as a learning project with focus on clean structure, UI flow,
+and state-driven interactions.
