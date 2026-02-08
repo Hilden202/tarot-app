@@ -58,6 +58,11 @@ Avsluta med en kort sammanfattning av kärnbudskapet.`;
         </button>
     </div>
 
+    <p class="disclaimer">
+        Frågan och tolkningen skapas av dig. Verktyget hjälper endast till att
+        formulera en strukturerad tarot-prompt för reflektion eller vidare tolkning.
+    </p>
+    
     <pre class="prompt-content">
 <code>{promptText}</code>
     </pre>
@@ -97,6 +102,13 @@ Avsluta med en kort sammanfattning av kärnbudskapet.`;
         font-family: monospace;
         white-space: pre-wrap;
         overflow-x: auto;
+    }
+
+    .disclaimer {
+        margin: 0.5rem 1rem;
+        font-size: 0.75rem;
+        color: #777;
+        text-align: center;
     }
 
 </style>
