@@ -1,6 +1,6 @@
 # Tarot App
 
-🔗 Live: https://hilden202.github.io/tarot-app/
+🔗 Live: https://tarot.hildenmedia.se/
 
 A small SvelteKit-based tarot app MVP.
 
