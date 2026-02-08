@@ -6,7 +6,8 @@ export default {
             fallback: 'index.html'
         }),
         paths: {
-            base: '/tarot-app'
+            base: '',
+            assets: ''
         }
     }
 };
