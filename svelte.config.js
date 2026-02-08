@@ -6,8 +6,7 @@ export default {
             fallback: 'index.html'
         }),
         paths: {
-            base: '',
-            assets: ''
+            base: ''
         }
     }
 };
