@@ -257,6 +257,9 @@
 		align-items: center;
 
 		animation: veil-float 18s linear infinite;
+		filter: drop-shadow(0 16px 30px rgba(0, 0, 0, 0.38)) drop-shadow(0 40px 80px rgba(0, 0, 0, 0.3));
+
+		transform-style: preserve-3d;
 	}
 
 	@keyframes veil-float {
@@ -287,9 +290,9 @@
 		height: 100%;
 		object-fit: cover;
 
-		opacity: 0.85;
-		filter: saturate(0.9) blur(0.3px);
+		opacity: 0.95;
 		border-radius: 12px;
+		box-shadow: inset 0 0 0 1px var(--card-border);
 	}
 
 	.cards {
