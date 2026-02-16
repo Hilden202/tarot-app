@@ -386,6 +386,9 @@
 		.theVeil {
 			width: 80vw;
 			max-width: 260px;
+
+			filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.32))
+				drop-shadow(0 24px 48px rgba(0, 0, 0, 0.22));
 		}
 	}
 </style>

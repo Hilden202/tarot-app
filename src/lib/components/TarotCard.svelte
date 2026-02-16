@@ -49,6 +49,8 @@
 		.card {
 			width: 80vw;
 			max-width: 260px;
+
+			filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.3)) drop-shadow(0 20px 40px rgba(0, 0, 0, 0.2));
 		}
 	}
 
