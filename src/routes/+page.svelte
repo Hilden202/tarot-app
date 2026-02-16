@@ -166,6 +166,7 @@
 		--muted-color: #6b6258;
 		--accent-color: #3e5f5b;
 		--surface-color: #ffffff;
+		--card-border: rgba(0, 0, 0, 0.08);
 
 		background: var(--bg-color);
 		color: var(--text-color);
@@ -182,6 +183,7 @@
 		--muted-color: #b7ada1;
 		--accent-color: #c2a45d;
 		--surface-color: rgba(255, 255, 255, 0.06);
+		--card-border: rgba(255, 255, 255, 0.08);
 
 		background: radial-gradient(circle at top center, #1c2626 0%, #121a1b 60%, #0e1415 100%);
 		color: var(--text-color);
