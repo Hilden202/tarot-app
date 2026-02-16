@@ -26,9 +26,12 @@
 
 	/* PRIMARY */
 	.btn.primary {
-		background: var(--accent-color);
-		color: var(--bg-color);
-		border-color: var(--accent-color);
+		background: linear-gradient(to bottom, var(--accent-light), var(--accent-dark));
+		color: var(--accent-text);
+		text-shadow: var(--accent-text-shadow);
+		box-shadow:
+			inset 0 1px 0 rgba(255, 255, 255, 0.2),
+			0 8px 20px rgba(0, 0, 0, 0.25);
 	}
 
 	.btn.primary:hover:not(:disabled) {
@@ -37,12 +40,14 @@
 
 	/* GHOST */
 	.btn.ghost {
-		background: transparent;
+		background: var(--surface-color);
 		color: var(--text-color);
-		border-color: var(--muted-color);
+		border: 1px solid var(--muted-color);
+		box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 	}
 
 	.btn.ghost:hover:not(:disabled) {
-		background: var(--surface-color);
+		transform: translateY(-1px);
+		box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 	}
 </style>
