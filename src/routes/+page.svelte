@@ -152,11 +152,40 @@
 
 <style lang="scss">
 	.page-wrapper {
+		position: relative;
 		background-color: var(--bg-color);
 		min-height: 100vh;
 		transition:
 			background 0.4s ease,
 			color 0.4s ease;
+	}
+
+	.page-wrapper::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		background: radial-gradient(circle at center, transparent 65%, rgba(0, 0, 0, 0.08) 100%);
+	}
+
+	.page-wrapper[data-theme='soul']::before {
+		background: radial-gradient(
+			circle at 50% 35%,
+			rgba(255, 255, 255, 0.05) 0%,
+			transparent 45%,
+			rgba(0, 0, 0, 0.28) 100%
+		);
+	}
+
+	@media (max-width: 600px) {
+		.page-wrapper[data-theme='soul']::before {
+			background: radial-gradient(
+				circle at 50% 35%,
+				rgba(255, 255, 255, 0.035) 0%,
+				transparent 50%,
+				rgba(0, 0, 0, 0.22) 100%
+			);
+		}
 	}
 
 	/* 🌿 TEMA 1 – CLEAN */
@@ -238,6 +267,8 @@
 	}
 
 	.app {
+		position: relative;
+		z-index: 1;
 		max-width: 900px;
 		margin: 0 auto;
 		padding: 2rem 1rem;
