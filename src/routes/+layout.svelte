@@ -49,6 +49,11 @@
 		--surface-color: #ffffff;
 		--card-border: rgba(0, 0, 0, 0.08);
 
+		--accent-light: #4f7570;
+		--accent-dark: #2f4b48;
+		--accent-text: #f5efe6;
+		--accent-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+
 		background: var(--bg-color);
 		color: var(--text-color);
 	}
@@ -61,8 +66,12 @@
 		--surface-color: rgba(255, 255, 255, 0.06);
 		--card-border: rgba(255, 255, 255, 0.08);
 
-		background: radial-gradient(circle at top center, #1c2626 0%, #121a1b 60%, #0e1415 100%);
+		--accent-light: #d8bb73;
+		--accent-dark: #a88d4e;
+		--accent-text: #121a1b;
+		--accent-text-shadow: 0 1px 2px rgba(255, 255, 255, 0.25);
 
+		background: radial-gradient(circle at top center, #1c2626 0%, #121a1b 60%, #0e1415 100%);
 		color: var(--text-color);
 	}
 
