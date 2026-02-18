@@ -5,8 +5,12 @@
 	import Button from '$lib/components/Button.svelte';
 	import type { TarotCardData } from '$lib/data/tarotDeck';
 	import { base } from '$app/paths';
+	import { language } from '$lib/stores/language';
+	import { translations } from '$lib/i18n/translations';
 
 	const guideImage = 'intro/the_veil.png';
+
+	let t;
 
 	let selectedCards: TarotCardData[] = [];
 
@@ -20,6 +24,8 @@
 	let cardCount = 3;
 
 	let hasDrawn = false;
+
+	$: t = translations[$language ?? 'sv'];
 
 	function resetDraw() {
 		selectedCards = [];
@@ -69,14 +75,14 @@
 <div class="page-wrapper">
 	<div class="app">
 		<header class="header">
-			<h1>Tarotläggning</h1>
+			<h1>{t.page.title}</h1>
 
 			<div class="status">
 				{#if !hasDrawn}
-					<p class="intro">Ta ett ögonblick, formulera en fråga och dra dina kort.</p>
+					<p class="intro">{t.page.intro}</p>
 				{:else}
 					<p class="progress">
-						{flippedIds.size} / {selectedCards.length} kort uppvända
+						{t.page.progress(flippedIds.size, selectedCards.length)}
 					</p>
 				{/if}
 			</div>
@@ -102,37 +108,38 @@
 					<div class="card-count">
 						<label>
 							<input type="radio" bind:group={cardCount} value={1} />
-							1 kort
+							{t.page.cardCountLabel(1)}
 						</label>
 
 						<label>
 							<input type="radio" bind:group={cardCount} value={2} />
-							2 kort
+							{t.page.cardCountLabel(2)}
 						</label>
 
 						<label>
 							<input type="radio" bind:group={cardCount} value={3} />
-							3 kort
+							{t.page.cardCountLabel(3)}
 						</label>
 					</div>
 				{/if}
 
 				<label>
-					<span>Din fråga:</span>
+					<span>{t.page.questionLabel}</span>
 					<textarea
 						bind:value={question}
-						placeholder="Vad vill du få vägledning kring just nu?"
+						placeholder={t.page.questionPlaceholder}
 						disabled={hasDrawn}
 					/>
 				</label>
 			</div>
-
 			{#if !hasDrawn}
 				<Button on:click={newCards} disabled={!question.trim()}>
-					Dra {cardCount} kort
+					{t.page.drawButton(cardCount)}
 				</Button>
 			{:else}
-				<Button variant="ghost" on:click={resetDraw}>Ny dragning</Button>
+				<Button variant="ghost" on:click={resetDraw}>
+					{t.page.resetButton}
+				</Button>
 			{/if}
 		</section>
 
@@ -157,10 +164,11 @@
 		inset: 0;
 		pointer-events: none;
 		background: radial-gradient(circle at center, transparent 65%, rgba(0, 0, 0, 0.08) 100%);
+		z-index: 0;
 	}
 
 	.status {
-		min-height: 1.5rem; /* exakt 1 textrad */
+		min-height: 1.5rem;
 		text-align: center;
 	}
 
@@ -309,10 +317,10 @@
 	}
 
 	.prompt {
-		display: flex;
-		justify-content: center;
 		margin-top: 2rem;
-		text-align: left;
+		max-width: 800px;
+		margin-left: auto;
+		margin-right: auto;
 	}
 
 	.prompt > * {

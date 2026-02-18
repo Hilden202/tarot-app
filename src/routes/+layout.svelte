@@ -2,6 +2,7 @@
 	import '../app.css';
 	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
+	import { language } from '$lib/stores/language';
 
 	let { children } = $props();
 	let theme = $state<'clean' | 'soul'>('clean');
@@ -15,7 +16,14 @@
 		}
 	}
 
+	function toggleLang() {
+		const next = $language === 'sv' ? 'en' : 'sv';
+		language.change(next);
+	}
 	onMount(() => {
+		language.init();
+		// currentLang = get(language);
+
 		if (!browser) return;
 
 		const saved = localStorage.getItem('theme') as 'clean' | 'soul' | null;
@@ -40,11 +48,17 @@
 	});
 </script>
 
-<button class="theme-toggle" on:click={toggleTheme} aria-label="Toggle theme">
-	<span class="icon" aria-hidden="true">
-		{theme === 'clean' ? '🌙' : '☀️'}
-	</span>
-</button>
+<div class="top-controls">
+	<button class="theme-toggle" on:click={toggleTheme}>
+		<span class="icon">
+			{theme === 'clean' ? '🌙' : '☀️'}
+		</span>
+	</button>
+
+	<button class="lang-toggle" on:click={toggleLang}>
+		{($language ?? 'sv').toUpperCase()}
+	</button>
+</div>
 
 {@render children()}
 
@@ -68,12 +82,16 @@
 			color 0.4s ease,
 			background-color 0.6s ease;
 	}
-	.theme-toggle {
+	.top-controls {
+		pointer-events: auto;
 		position: fixed;
 		top: 1rem;
 		right: 1rem;
-		z-index: 1000;
-
+		display: flex;
+		gap: 0.5rem;
+		z-index: 9999;
+	}
+	.lang-toggle {
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -87,13 +105,18 @@
 		background: transparent;
 		color: var(--text-color);
 
+		font-size: 0.8rem;
 		cursor: pointer;
+	}
 
-		transition:
-			background 0.25s ease,
-			border-color 0.25s ease,
-			transform 0.15s ease,
-			box-shadow 0.3s ease;
+	.theme-toggle {
+		width: 44px;
+		height: 44px;
+		border-radius: 999px;
+		border: 1px solid currentColor;
+		background: transparent;
+		color: var(--text-color);
+		cursor: pointer;
 	}
 
 	.theme-toggle:hover {

@@ -1,8 +1,16 @@
 ﻿<script lang="ts">
+	import { language } from '$lib/stores/language';
+	import { translations } from '$lib/i18n/translations';
+	import { get } from 'svelte/store';
 	import type { TarotCardData } from '$lib/data/tarotDeck';
 
 	export let cards: TarotCardData[];
 	export let question: string;
+
+	let t: (typeof translations)['sv'];
+	let promptText: string;
+
+	$: t = translations[$language ?? 'sv'];
 
 	let copied = false;
 
@@ -16,54 +24,42 @@
 	}
 
 	function getInterpretationFrame(cardCount: number) {
-		if (cardCount === 1) {
-			return `Tolka detta kort som ett övergripande budskap kopplat till frågan.
-Fokusera på insikt, riktning och medvetenhet snarare än detaljer eller förutsägelser.`;
-		}
-
-		if (cardCount === 2) {
-			return `Tolka korten som två perspektiv som belyser frågan från olika håll.
-Fokusera på hur de samspelar, kontrasterar eller kompletterar varandra.`;
-		}
-
-		// default: 3-korts vägledning
-		return `Tolka tarotläggningen som en helhet, inte enbart kort för kort.
-Fokusera på det övergripande temat, hur korten samspelar och vilken vägledning som är relevant för frågan.`;
+		if (cardCount === 1) return t.prompt.frames.one;
+		if (cardCount === 2) return t.prompt.frames.two;
+		return t.prompt.frames.three;
 	}
 
-	$: promptText = `Tarotläggning – tolkning önskas
+	$: promptText = `${t.prompt.title}
 
-Jag har ställt följande fråga:
-"${question}"
+	${t.prompt.questionIntro}
+	"${question}"
 
-Jag drog ${cards.length} tarotkort:
-${cards.map((c) => `- ${c.fullTitle}`).join('\n')}
+	${t.prompt.cardsIntro(cards.length)}
+	${cards.map((c) => `- ${c.fullTitle}`).join('\n')}
 
-${getInterpretationFrame(cards.length)}
+	${getInterpretationFrame(cards.length)}
 
-Tolkningen ska vara reflekterande, jordnära och stödjande –
-inte förutsägande eller absolut.
+	${t.prompt.tone}
 
-Avsluta med en kort sammanfattning av kärnbudskapet.`;
+	${t.prompt.summary}`;
 </script>
 
 <div class="prompt-box">
 	<div class="prompt-header">
-		<h3>Tarotprompt – redo att kopiera</h3>
+		<h3>{t.prompt.header}</h3>
 
 		<button class="copy-btn" on:click={copyPrompt}>
-			{copied ? 'Kopierad ✓' : 'Kopiera'}
+			{copied ? t.prompt.copied : t.prompt.copy}
 		</button>
 	</div>
 
-	<p class="disclaimer">
-		Frågan och tolkningen skapas av dig. Verktyget hjälper endast till att formulera en strukturerad
-		tarot-prompt för reflektion eller vidare tolkning.
-	</p>
+	<p class="disclaimer">{t.prompt.disclaimer}</p>
 
-	<pre class="prompt-content">
-<code>{promptText}</code>
-    </pre>
+	<div class="prompt-content">
+		{#each promptText.split('\n') as line}
+			<p>{line}</p>
+		{/each}
+	</div>
 </div>
 
 <style>
@@ -98,11 +94,15 @@ Avsluta med en kort sammanfattning av kärnbudskapet.`;
 	}
 
 	.prompt-content {
+		text-align: left;
 		padding: 1rem;
 		margin: 0;
 		font-family: monospace;
-		white-space: pre-wrap;
 		overflow-x: auto;
+	}
+
+	.prompt-content p {
+		margin: 0 0 0.6rem 0;
 	}
 
 	.disclaimer {
