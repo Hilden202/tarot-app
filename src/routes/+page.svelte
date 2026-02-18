@@ -8,8 +8,6 @@
 
 	const guideImage = 'intro/the_veil.png';
 
-	let theme: 'clean' | 'soul' = 'clean';
-
 	let selectedCards: TarotCardData[] = [];
 
 	let allCardsFlipped: boolean = false;
@@ -68,13 +66,9 @@
 	}
 </script>
 
-<div class="page-wrapper" data-theme={theme}>
+<div class="page-wrapper">
 	<div class="app">
 		<header class="header">
-			<button class="theme-toggle" on:click={() => (theme = theme === 'clean' ? 'soul' : 'clean')}>
-				{theme === 'clean' ? '🌙' : '☀️'}
-			</button>
-
 			<h1>Tarotläggning</h1>
 
 			<div class="status">
@@ -153,11 +147,8 @@
 <style lang="scss">
 	.page-wrapper {
 		position: relative;
-		background-color: var(--bg-color);
 		min-height: 100vh;
-		transition:
-			background 0.4s ease,
-			color 0.4s ease;
+		width: 100%;
 	}
 
 	.page-wrapper::before {
@@ -166,66 +157,6 @@
 		inset: 0;
 		pointer-events: none;
 		background: radial-gradient(circle at center, transparent 65%, rgba(0, 0, 0, 0.08) 100%);
-	}
-
-	.page-wrapper[data-theme='soul']::before {
-		background: radial-gradient(
-			circle at 50% 35%,
-			rgba(255, 255, 255, 0.05) 0%,
-			transparent 45%,
-			rgba(0, 0, 0, 0.28) 100%
-		);
-	}
-
-	@media (max-width: 600px) {
-		.page-wrapper[data-theme='soul']::before {
-			background: radial-gradient(
-				circle at 50% 35%,
-				rgba(255, 255, 255, 0.035) 0%,
-				transparent 50%,
-				rgba(0, 0, 0, 0.22) 100%
-			);
-		}
-	}
-
-	/* 🌿 TEMA 1 – CLEAN */
-	.page-wrapper[data-theme='clean'] {
-		--bg-color: #f5efe6;
-		--text-color: #2f2a25;
-		--muted-color: #6b6258;
-		--accent-color: #3e5f5b;
-		--surface-color: #ffffff;
-		--card-border: rgba(0, 0, 0, 0.08);
-		--accent-color: #3e5f5b;
-		--accent-light: #4f7570;
-		--accent-dark: #2f4b48;
-		--accent-text: #f5efe6;
-		--accent-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
-
-		background: var(--bg-color);
-		color: var(--text-color);
-	}
-
-	.page-wrapper[data-theme='clean'] .prompt > * {
-		background: #ffffff;
-	}
-
-	/* 🔥 TEMA 2 – SOUL */
-	.page-wrapper[data-theme='soul'] {
-		--bg-color: #121a1b;
-		--text-color: #e8e2d8;
-		--muted-color: #b7ada1;
-		--accent-color: #c2a45d;
-		--surface-color: rgba(255, 255, 255, 0.06);
-		--card-border: rgba(255, 255, 255, 0.08);
-		--accent-color: #c2a45d;
-		--accent-light: #d8bb73;
-		--accent-dark: #a88d4e;
-		--accent-text: #121a1b;
-		--accent-text-shadow: 0 1px 2px rgba(255, 255, 255, 0.25);
-
-		background: radial-gradient(circle at top center, #1c2626 0%, #121a1b 60%, #0e1415 100%);
-		color: var(--text-color);
 	}
 
 	.theme-toggle {
