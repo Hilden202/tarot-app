@@ -11,16 +11,32 @@
 
 		if (browser) {
 			document.body.dataset.theme = theme;
+			localStorage.setItem('theme', theme);
 		}
 	}
 
 	onMount(() => {
 		if (!browser) return;
 
-		const existing = document.body.dataset.theme as 'clean' | 'soul' | undefined;
+		const saved = localStorage.getItem('theme') as 'clean' | 'soul' | null;
 
-		theme = existing ?? 'clean';
+		if (saved) {
+			theme = saved;
+		} else {
+			const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+			theme = prefersDark ? 'soul' : 'clean';
+		}
+
 		document.body.dataset.theme = theme;
+
+		// 🔥 live system detection
+		const media = window.matchMedia('(prefers-color-scheme: dark)');
+		media.addEventListener('change', (e) => {
+			if (!localStorage.getItem('theme')) {
+				theme = e.matches ? 'soul' : 'clean';
+				document.body.dataset.theme = theme;
+			}
+		});
 	});
 </script>
 
