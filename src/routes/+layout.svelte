@@ -1,21 +1,35 @@
 <script lang="ts">
+	import '../app.css';
 	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
 
 	let { children } = $props();
-	let theme: 'clean' | 'soul' = 'clean';
+	let theme = $state<'clean' | 'soul'>('clean');
 
 	function toggleTheme() {
 		theme = theme === 'clean' ? 'soul' : 'clean';
-		document.body.dataset.theme = theme;
+
+		if (browser) {
+			document.body.dataset.theme = theme;
+		}
+
+		console.log('theme state:', theme);
 	}
 
 	onMount(() => {
+		if (!browser) return;
+
+		const existing = document.body.dataset.theme as 'clean' | 'soul' | undefined;
+
+		theme = existing ?? 'clean';
 		document.body.dataset.theme = theme;
 	});
 </script>
 
-<button class="theme-toggle" on:click={toggleTheme}>
-	{theme === 'clean' ? '🌙' : '☀️'}
+<button class="theme-toggle" on:click={toggleTheme} aria-label="Toggle theme">
+	<span class="icon" aria-hidden="true">
+		{theme === 'clean' ? '🌙' : '☀️'}
+	</span>
 </button>
 
 {@render children()}
@@ -40,51 +54,51 @@
 			color 0.4s ease,
 			background-color 0.6s ease;
 	}
-
-	/* 🌿 CLEAN */
-	:global(body[data-theme='clean']) {
-		--bg-color: #f5efe6;
-		--text-color: #2f2a25;
-		--muted-color: #6b6258;
-		--surface-color: #ffffff;
-		--card-border: rgba(0, 0, 0, 0.08);
-
-		--accent-light: #4f7570;
-		--accent-dark: #2f4b48;
-		--accent-text: #f5efe6;
-		--accent-text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
-
-		background: var(--bg-color);
-		color: var(--text-color);
-	}
-
-	/* 🔥 SOUL */
-	:global(body[data-theme='soul']) {
-		--bg-color: #121a1b;
-		--text-color: #e8e2d8;
-		--muted-color: #b7ada1;
-		--surface-color: rgba(255, 255, 255, 0.06);
-		--card-border: rgba(255, 255, 255, 0.08);
-
-		--accent-light: #d8bb73;
-		--accent-dark: #a88d4e;
-		--accent-text: #121a1b;
-		--accent-text-shadow: 0 1px 2px rgba(255, 255, 255, 0.25);
-
-		background: radial-gradient(circle at top center, #1c2626 0%, #121a1b 60%, #0e1415 100%);
-		color: var(--text-color);
-	}
-
 	.theme-toggle {
 		position: fixed;
 		top: 1rem;
 		right: 1rem;
 		z-index: 1000;
+
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		width: 44px;
+		height: 44px;
+
+		border-radius: 999px;
+		border: 1px solid currentColor;
+
 		background: transparent;
-		border: 1px solid var(--muted-color);
 		color: var(--text-color);
-		padding: 0.4rem 0.7rem;
-		border-radius: 20px;
+
 		cursor: pointer;
+
+		transition:
+			background 0.25s ease,
+			border-color 0.25s ease,
+			transform 0.15s ease,
+			box-shadow 0.3s ease;
+	}
+
+	.theme-toggle:hover {
+		background: var(--accent-light);
+		color: var(--accent-text);
+		border-color: var(--accent-light);
+		transform: translateY(-1px);
+	}
+
+	.theme-toggle:active {
+		transform: translateY(0);
+	}
+
+	.icon {
+		display: inline-block;
+		transition: transform 0.3s ease;
+	}
+
+	.theme-toggle:hover .icon {
+		transform: rotate(15deg) scale(1.1);
 	}
 </style>

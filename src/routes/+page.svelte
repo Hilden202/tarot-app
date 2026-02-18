@@ -159,24 +159,6 @@
 		background: radial-gradient(circle at center, transparent 65%, rgba(0, 0, 0, 0.08) 100%);
 	}
 
-	.theme-toggle {
-		position: absolute;
-		top: 1rem;
-		right: 1rem;
-		background: transparent;
-		border: 1px solid var(--muted-color);
-		color: var(--text-color);
-		padding: 0.3rem 0.6rem;
-		border-radius: 20px;
-		cursor: pointer;
-		transition: all 0.3s ease;
-	}
-
-	.theme-toggle:hover {
-		background: var(--accent-color);
-		color: var(--bg-color);
-	}
-
 	.status {
 		min-height: 1.5rem; /* exakt 1 textrad */
 		text-align: center;

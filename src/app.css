@@ -1,0 +1,59 @@
+/* 🌿 CLEAN */
+body[data-theme='clean'] {
+  --bg-color: #f5efe6;
+  --text-color: #2f2a25;
+  --muted-color: #6b6258;
+  --surface-color: #ffffff;
+  --card-border: rgba(0, 0, 0, 0.08);
+
+  --accent-light: #4f7570;
+  --accent-dark: #2f4b48;
+  --accent-text: #f5efe6;
+
+  background: var(--bg-color);
+  color: var(--text-color);
+}
+
+/* 🔥 SOUL */
+body[data-theme='soul'] {
+  --bg-color: #121a1b;
+  --text-color: #e8e2d8;
+  --muted-color: #b7ada1;
+  --surface-color: rgba(255, 255, 255, 0.06);
+  --card-border: rgba(255, 255, 255, 0.08);
+
+  --accent-light: #d8bb73;
+  --accent-dark: #a88d4e;
+  --accent-text: #121a1b;
+
+  background: radial-gradient(
+    circle at top center,
+    #1c2626 0%,
+    #121a1b 60%,
+    #0e1415 100%
+  );
+  color: var(--text-color);
+}
+
+/* 🎛 Theme-specific toggle styling */
+
+body[data-theme='clean'] .theme-toggle {
+	background: rgba(0, 0, 0, 0.02);
+	border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+
+body[data-theme='soul'] .theme-toggle {
+	background: rgba(255, 255, 255, 0.04);
+	border: 1px solid rgba(255, 255, 255, 0.15);
+
+	box-shadow:
+		0 0 8px rgba(216, 187, 115, 0.3),
+		0 0 20px rgba(216, 187, 115, 0.15);
+}
+
+body[data-theme='soul'] .theme-toggle:hover {
+	box-shadow:
+		0 0 12px rgba(216, 187, 115, 0.5),
+		0 0 28px rgba(216, 187, 115, 0.25);
+}
