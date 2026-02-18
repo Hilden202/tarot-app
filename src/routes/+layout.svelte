@@ -12,8 +12,6 @@
 		if (browser) {
 			document.body.dataset.theme = theme;
 		}
-
-		console.log('theme state:', theme);
 	}
 
 	onMount(() => {
