@@ -57,3 +57,24 @@ body[data-theme='soul'] .theme-toggle:hover {
 		0 0 12px rgba(216, 187, 115, 0.5),
 		0 0 28px rgba(216, 187, 115, 0.25);
 }
+body[data-theme='soul'] .background-layer {
+  background:
+    radial-gradient(circle at 50% 20%, rgba(216, 187, 115, 0.15), transparent 40%),
+    radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.03), transparent 50%);
+  filter: blur(40px);
+  opacity: 0.7;
+
+  animation: floatGlow 30s ease-in-out infinite;
+}
+
+body[data-theme='clean'] .background-layer {
+	background:
+		radial-gradient(circle at top center, rgba(79, 117, 112, 0.08), transparent 60%),
+		linear-gradient(180deg, rgba(255,255,255,0.4), transparent 40%);
+}
+
+@keyframes floatGlow {
+  0%   { transform: translateY(0px); }
+  50%  { transform: translateY(-3px); }
+  100% { transform: translateY(0px); }
+}
