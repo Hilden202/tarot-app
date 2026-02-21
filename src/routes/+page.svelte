@@ -26,7 +26,7 @@
 
 	let hasDrawn = false;
 
-	let questionFromSuggestion = false;
+	let selectedSuggestionIndex: number | null = null;
 	// Tracks whether the current question was auto-filled from suggestions
 
 	let previousCardCount: 1 | 2 | 3 = cardCount;
@@ -36,12 +36,18 @@
 
 	$: visibleQuestions = t.questions[cardCount].slice(0, 4);
 
+	// If a suggestion is selected, keep the question synced with
+	// the current language and spread size (same index, new text)
+	$: if (selectedSuggestionIndex !== null) {
+		question = t.questions[cardCount][selectedSuggestionIndex];
+	}
+
 	$: if (cardCount !== previousCardCount) {
 		// If the spread size changes and the question was auto-filled,
 		// clear it to avoid mismatched spread/question context
-		if (questionFromSuggestion) {
+		if (selectedSuggestionIndex !== null) {
 			question = '';
-			questionFromSuggestion = false;
+			selectedSuggestionIndex = null;
 		}
 		previousCardCount = cardCount;
 	}
@@ -147,19 +153,21 @@
 						<span>{t.page.questionLabel}</span>
 						<textarea
 							bind:value={question}
-							on:input={() => (questionFromSuggestion = false)}
+							on:input={() => {
+								selectedSuggestionIndex = null;
+							}}
 							placeholder={t.page.questionPlaceholder}
 							disabled={hasDrawn}
 						/>
 					</label>
 					{#if !hasDrawn}
 						<div class="suggestions">
-							{#each visibleQuestions as q}
+							{#each visibleQuestions as q, index}
 								<button
 									type="button"
 									on:click={() => {
 										question = q;
-										questionFromSuggestion = true;
+										selectedSuggestionIndex = index;
 									}}
 								>
 									{q}
