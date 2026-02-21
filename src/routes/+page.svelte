@@ -21,11 +21,13 @@
 
 	let drawId = 0;
 
-	let cardCount = 3;
+	let cardCount: 1 | 2 | 3 = 3; // Best practice for TS
 
 	let hasDrawn = false;
 
 	$: t = translations[$language ?? 'sv'];
+
+	$: visibleQuestions = t.questions[cardCount].slice(0, 4);
 
 	function resetDraw() {
 		selectedCards = [];
@@ -103,44 +105,55 @@
 		</section>
 
 		<section class="controls">
-			<div class="question">
+			<div class="control-inner">
+				<div class="question">
+					{#if !hasDrawn}
+						<div class="card-count">
+							<label>
+								<input type="radio" bind:group={cardCount} value={1} />
+								{t.page.cardCountLabel(1)}
+							</label>
+
+							<label>
+								<input type="radio" bind:group={cardCount} value={2} />
+								{t.page.cardCountLabel(2)}
+							</label>
+
+							<label>
+								<input type="radio" bind:group={cardCount} value={3} />
+								{t.page.cardCountLabel(3)}
+							</label>
+						</div>
+					{/if}
+
+					<label>
+						<span>{t.page.questionLabel}</span>
+						<textarea
+							bind:value={question}
+							placeholder={t.page.questionPlaceholder}
+							disabled={hasDrawn}
+						/>
+					</label>
+					{#if !hasDrawn}
+						<div class="suggestions">
+							{#each visibleQuestions as q}
+								<button type="button" on:click={() => (question = q)}>
+									{q}
+								</button>
+							{/each}
+						</div>
+					{/if}
+				</div>
 				{#if !hasDrawn}
-					<div class="card-count">
-						<label>
-							<input type="radio" bind:group={cardCount} value={1} />
-							{t.page.cardCountLabel(1)}
-						</label>
-
-						<label>
-							<input type="radio" bind:group={cardCount} value={2} />
-							{t.page.cardCountLabel(2)}
-						</label>
-
-						<label>
-							<input type="radio" bind:group={cardCount} value={3} />
-							{t.page.cardCountLabel(3)}
-						</label>
-					</div>
+					<Button on:click={newCards} disabled={!question.trim()}>
+						{t.page.drawButton(cardCount)}
+					</Button>
+				{:else}
+					<Button variant="ghost" on:click={resetDraw}>
+						{t.page.resetButton}
+					</Button>
 				{/if}
-
-				<label>
-					<span>{t.page.questionLabel}</span>
-					<textarea
-						bind:value={question}
-						placeholder={t.page.questionPlaceholder}
-						disabled={hasDrawn}
-					/>
-				</label>
 			</div>
-			{#if !hasDrawn}
-				<Button on:click={newCards} disabled={!question.trim()}>
-					{t.page.drawButton(cardCount)}
-				</Button>
-			{:else}
-				<Button variant="ghost" on:click={resetDraw}>
-					{t.page.resetButton}
-				</Button>
-			{/if}
 		</section>
 
 		{#if allCardsFlipped}
@@ -190,6 +203,7 @@
 	.app {
 		position: relative;
 		z-index: 1;
+		width: 100%;
 		max-width: 900px;
 		margin: 0 auto;
 		padding: 2rem 1rem;
@@ -211,7 +225,7 @@
 	}
 
 	.theVeil {
-		width: min(28vw, 230px);
+		width: 230px;
 		aspect-ratio: 2 / 3;
 
 		display: flex;
@@ -222,6 +236,16 @@
 		filter: drop-shadow(0 16px 30px rgba(0, 0, 0, 0.38)) drop-shadow(0 40px 80px rgba(0, 0, 0, 0.3));
 
 		transform-style: preserve-3d;
+	}
+
+	@media (max-width: 600px) {
+		.theVeil {
+			width: 80vw;
+			max-width: 260px;
+
+			filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.32))
+				drop-shadow(0 24px 48px rgba(0, 0, 0, 0.22));
+		}
 	}
 
 	@keyframes veil-float {
@@ -264,6 +288,11 @@
 		flex-wrap: wrap;
 	}
 
+	@media (max-width: 600px) {
+		.cards {
+			gap: 1rem;
+		}
+	}
 	.card-count {
 		display: flex;
 		gap: 1rem;
@@ -271,30 +300,38 @@
 	}
 
 	.card-count label {
-		display: flex;
-		gap: 0.25rem;
-		align-items: center;
-		font-size: 0.9rem;
+		padding: 0.35rem 0.6rem;
+		border-radius: 8px;
+		transition: background 0.2s ease;
+	}
+
+	.card-count label:hover {
+		background: var(--surface-color);
+		cursor: pointer;
+	}
+
+	.card-count input[type='radio'] {
+		accent-color: var(--accent-light);
+		cursor: pointer;
 	}
 
 	.controls {
 		display: flex;
 		justify-content: center;
-		align-items: flex-end;
+	}
+
+	.control-inner {
+		width: 100%;
+		max-width: 420px;
+		display: flex;
+		flex-direction: column;
 		gap: 1rem;
 	}
 
-	@media (max-width: 600px) {
-		.controls {
-			flex-direction: column;
-			align-items: stretch;
-		}
-
-		.controls button {
-			width: 100%;
-			max-width: 420px;
-			align-self: center;
-		}
+	.controls button {
+		width: 100%;
+		max-width: 420px;
+		margin-top: 0.5rem;
 	}
 
 	.question {
@@ -316,6 +353,30 @@
 		padding: 0.5rem;
 	}
 
+	.suggestions {
+		justify-content: flex-start;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-top: 0.5rem;
+	}
+
+	.suggestions button {
+		background: var(--surface-color);
+		border: 1px solid var(--muted-color);
+		color: var(--text-color);
+		border-radius: 999px;
+		padding: 0.35rem 0.75rem;
+		font-size: 0.8rem;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.suggestions button:hover {
+		border-color: var(--card-border);
+		background: rgba(255, 255, 255, 0.05);
+	}
+
 	.prompt {
 		margin-top: 2rem;
 		max-width: 800px;
@@ -326,21 +387,5 @@
 	.prompt > * {
 		background: var(--surface-color);
 		border-radius: 12px;
-	}
-
-	@media (max-width: 600px) {
-		.cards {
-			gap: 1rem;
-		}
-	}
-
-	@media (max-width: 600px) {
-		.theVeil {
-			width: 80vw;
-			max-width: 260px;
-
-			filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.32))
-				drop-shadow(0 24px 48px rgba(0, 0, 0, 0.22));
-		}
 	}
 </style>

@@ -1,7 +1,6 @@
 ﻿<script lang="ts">
 	import { language } from '$lib/stores/language';
 	import { translations } from '$lib/i18n/translations';
-	import { get } from 'svelte/store';
 	import type { TarotCardData } from '$lib/data/tarotDeck';
 
 	export let cards: TarotCardData[];

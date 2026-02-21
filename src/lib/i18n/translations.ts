@@ -12,6 +12,13 @@ cardCountLabel: (count: number) => string;
 progress: (flipped: number, total: number) => string;
 };
 
+questions: {
+        1: string[];
+        2: string[];
+        3: string[];
+    
+}
+
 prompt: {
 header: string;
 copy: string;
@@ -48,6 +55,26 @@ count === 1 ? '1 kort' : `${count} kort`,
 
 progress: (flipped: number, total: number) =>
 `${flipped} / ${total} kort uppvända`
+},
+questions: {
+  1: [
+    'Vad är viktigt att vara medveten om just nu?',
+    'Vad behöver min uppmärksamhet idag?',
+    'Vad vill bli tydligare för mig?',
+    'Vilken är den viktigaste insikten i detta ögonblick?'
+  ],
+  2: [
+    'Vad stöttar mig och vad håller mig tillbaka?',
+    'Vad sker inom mig och vad sker omkring mig?',
+    'Vad vill jag och vad behöver jag?',
+    'Vad stärker mig och vad tar min energi?'
+  ],
+  3: [
+    'Nuvarande situation – utmaning – vägledning',
+    'Vad är synligt – vad är dolt – vad håller på att ta form',
+    'Var jag är – vad som förändras – hur jag kan förhålla mig',
+    'Rot – påverkan – integrering'
+  ]
 },
 prompt: {
 header: 'Tarotprompt – redo att kopiera',
@@ -94,6 +121,26 @@ count === 1 ? '1 card' : `${count} cards`,
 
 progress: (flipped: number, total: number) =>
 `${flipped} / ${total} cards revealed`
+},
+questions: {
+  1: [
+    'What is important to be aware of right now?',
+    'What needs my attention today?',
+    'What wants to be understood more clearly?',
+    'What is the key insight for this moment?'
+  ],
+  2: [
+    'What supports me and what holds me back?',
+    'What is happening internally and externally?',
+    'What do I want and what do I need?',
+    'What strengthens me and what drains me?'
+  ],
+  3: [
+    'Current situation – challenge – guidance',
+    'What is visible – what is hidden – what is emerging',
+    'Where I am – what is shifting – how to respond',
+    'Root – influence – integration'
+  ]
 },
 prompt: {
 header: 'Tarot prompt – ready to copy',
