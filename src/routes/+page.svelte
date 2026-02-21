@@ -21,13 +21,30 @@
 
 	let drawId = 0;
 
-	let cardCount: 1 | 2 | 3 = 3; // restrict to valid spread sizes
+	let cardCount: 1 | 2 | 3 = 3;
+	// restrict to valid spread sizes
 
 	let hasDrawn = false;
+
+	let questionFromSuggestion = false;
+	// Tracks whether the current question was auto-filled from suggestions
+
+	let previousCardCount: 1 | 2 | 3 = cardCount;
+	// Used to detect spread size changes
 
 	$: t = translations[$language ?? 'sv'];
 
 	$: visibleQuestions = t.questions[cardCount].slice(0, 4);
+
+	$: if (cardCount !== previousCardCount) {
+		// If the spread size changes and the question was auto-filled,
+		// clear it to avoid mismatched spread/question context
+		if (questionFromSuggestion) {
+			question = '';
+			questionFromSuggestion = false;
+		}
+		previousCardCount = cardCount;
+	}
 
 	function resetDraw() {
 		selectedCards = [];
@@ -130,6 +147,7 @@
 						<span>{t.page.questionLabel}</span>
 						<textarea
 							bind:value={question}
+							on:input={() => (questionFromSuggestion = false)}
 							placeholder={t.page.questionPlaceholder}
 							disabled={hasDrawn}
 						/>
@@ -137,7 +155,13 @@
 					{#if !hasDrawn}
 						<div class="suggestions">
 							{#each visibleQuestions as q}
-								<button type="button" on:click={() => (question = q)}>
+								<button
+									type="button"
+									on:click={() => {
+										question = q;
+										questionFromSuggestion = true;
+									}}
+								>
 									{q}
 								</button>
 							{/each}
