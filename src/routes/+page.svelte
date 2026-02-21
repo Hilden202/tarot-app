@@ -21,7 +21,7 @@
 
 	let drawId = 0;
 
-	let cardCount: 1 | 2 | 3 = 3; // Best practice for TS
+	let cardCount: 1 | 2 | 3 = 3; // restrict to valid spread sizes
 
 	let hasDrawn = false;
 
@@ -165,6 +165,12 @@
 </div>
 
 <style lang="scss">
+	/*prevent mobile overflow*/
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
 	.page-wrapper {
 		position: relative;
 		min-height: 100vh;
