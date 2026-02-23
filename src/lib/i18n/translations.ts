@@ -58,22 +58,22 @@ progress: (flipped: number, total: number) =>
 },
 questions: {
   1: [
-    'Vad är viktigt att vara medveten om just nu?',
-    'Vad behöver min uppmärksamhet idag?',
-    'Vad vill bli tydligare för mig?',
-    'Vilken är den viktigaste insikten i detta ögonblick?'
+    'Vad är kärnan i situationen just nu?',
+    'Vad behöver jag förstå djupare?',
+    'Vilken energi präglar detta ögonblick?',
+    'Vad vill bli medvetet i mig?'
   ],
   2: [
     'Vad stöttar mig och vad håller mig tillbaka?',
-    'Vad sker inom mig och vad sker omkring mig?',
+    'Vad är inre påverkan och vad är yttre påverkan?',
     'Vad vill jag och vad behöver jag?',
-    'Vad stärker mig och vad tar min energi?'
+    'Vad är i balans och vad är i obalans?'
   ],
   3: [
-    'Nuvarande situation – utmaning – vägledning',
-    'Vad är synligt – vad är dolt – vad håller på att ta form',
-    'Var jag är – vad som förändras – hur jag kan förhålla mig',
-    'Rot – påverkan – integrering'
+    'Dåtid – Nutid – Framtid',
+    'Situation – Utmaning – Vägledning',
+    'Vad är synligt – Vad är dolt – Vad håller på att ta form',
+    'Rot – Rörelse – Resultat'
   ]
 },
 prompt: {
@@ -124,22 +124,22 @@ progress: (flipped: number, total: number) =>
 },
 questions: {
   1: [
-    'What is important to be aware of right now?',
-    'What needs my attention today?',
-    'What wants to be understood more clearly?',
-    'What is the key insight for this moment?'
+    'What is the core of this situation right now?',
+    'What needs deeper understanding?',
+    'What energy defines this moment?',
+    'What wants to become conscious within me?'
   ],
   2: [
     'What supports me and what holds me back?',
-    'What is happening internally and externally?',
+    'What is internal influence and what is external influence?',
     'What do I want and what do I need?',
-    'What strengthens me and what drains me?'
+    'What is in balance and what is out of balance?'
   ],
   3: [
-    'Current situation – challenge – guidance',
-    'What is visible – what is hidden – what is emerging',
-    'Where I am – what is shifting – how to respond',
-    'Root – influence – integration'
+    'Past – Present – Future',
+    'Situation – Challenge – Guidance',
+    'What is visible – What is hidden – What is emerging',
+    'Root – Movement – Outcome'
   ]
 },
 prompt: {
