@@ -71,6 +71,7 @@ export let ariaLabel = 'Tarot question scroll';
 	function handlePointerDown(event: PointerEvent) {
 		if (disabled || totalQuestions < 2) return;
 		pointerActive = true;
+		(event.currentTarget as HTMLElement)?.setPointerCapture(event.pointerId);
 		moved = false;
 		dragDistance = 0;
 		startY = event.clientY;
@@ -104,8 +105,11 @@ export let ariaLabel = 'Tarot question scroll';
 		}
 	}
 
-	function finishGesture() {
+	function finishGesture(event?: PointerEvent) {
 		if (!pointerActive) return;
+		try {
+			(event?.currentTarget as HTMLElement)?.releasePointerCapture?.(event.pointerId);
+		} catch {}
 		pointerActive = false;
 
 		const threshold = 18;
@@ -168,8 +172,8 @@ export let ariaLabel = 'Tarot question scroll';
 		on:keydown={handleKeydown}
 		on:pointerdown={handlePointerDown}
 		on:pointermove={handlePointerMove}
-		on:pointerup={finishGesture}
-		on:pointercancel={finishGesture}
+		on:pointerup={(e) => finishGesture(e)}
+		on:pointercancel={(e) => finishGesture(e)}
 		on:pointerleave={resetTilt}
 		style={`--drag-y:${dragDistance}px;`}
 	>
@@ -248,7 +252,8 @@ export let ariaLabel = 'Tarot question scroll';
 		user-select: none;
 		-webkit-user-select: none;
 		-ms-user-select: none;
-		touch-action: pan-y;
+		touch-action: none;
+		-webkit-touch-callout: none;
 	}
 
 	.scroll-face {
