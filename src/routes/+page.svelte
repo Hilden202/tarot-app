@@ -65,7 +65,7 @@
 
 	$: t = translations[$language ?? 'sv'];
 
-	$: visibleQuestions = t.questions[cardCount].slice(0, 4);
+	$: visibleQuestions = t.questions[cardCount].slice(0, 3);
 
 	// If a suggestion is selected, keep the question synced with
 	// the current language and spread size (same index, new text)
@@ -83,19 +83,24 @@
 		previousCardCount = cardCount;
 	}
 
-	$: if (allCardsFlipped && !hasFetched && !isLoading) {
-		hasFetched = true;
-		fetchInterpretation();
-	}
-
 	$: if (allCardsFlipped && !isLoading && hasDrawn) {
 		const lang = $language ?? 'sv';
 
 		if (interpretationCache[lang]) {
 			interpretation = interpretationCache[lang];
 			startTyping(interpretation);
-		} else if (hasFetched) {
+		} else if (!hasFetched) {
+			hasFetched = true;
 			fetchInterpretation();
+		}
+	}
+
+	$: if (allCardsFlipped && hasDrawn) {
+		const lang = $language ?? 'sv';
+
+		// Reset fetch flag if switching to a language we don't have cached yet
+		if (!interpretationCache[lang]) {
+			hasFetched = false;
 		}
 	}
 

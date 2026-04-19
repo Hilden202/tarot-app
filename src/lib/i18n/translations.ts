@@ -61,20 +61,17 @@ questions: {
   1: [
     'Vad är kärnan i situationen just nu?',
     'Vad behöver jag förstå djupare?',
-    'Vilken energi präglar detta ögonblick?',
-    'Vad vill bli medvetet i mig?'
+    'Vilken energi präglar detta ögonblick?'
   ],
   2: [
     'Vad stöttar mig och vad håller mig tillbaka?',
     'Vad är inre påverkan och vad är yttre påverkan?',
-    'Vad vill jag och vad behöver jag?',
-    'Vad är i balans och vad är i obalans?'
+    'Vad vill jag och vad behöver jag?'
   ],
   3: [
     'Dåtid – Nutid – Framtid',
     'Situation – Utmaning – Vägledning',
-    'Vad är synligt – Vad är dolt – Vad håller på att ta form',
-    'Rot – Rörelse – Resultat'
+    'Vad är synligt – Vad är dolt – Vad håller på att ta form'
   ]
 },
 prompt: {
@@ -128,20 +125,17 @@ questions: {
   1: [
     'What is the core of this situation right now?',
     'What needs deeper understanding?',
-    'What energy defines this moment?',
-    'What wants to become conscious within me?'
+    'What energy defines this moment?'
   ],
   2: [
     'What supports me and what holds me back?',
     'What is internal influence and what is external influence?',
-    'What do I want and what do I need?',
-    'What is in balance and what is out of balance?'
+    'What do I want and what do I need?'
   ],
   3: [
     'Past – Present – Future',
     'Situation – Challenge – Guidance',
-    'What is visible – What is hidden – What is emerging',
-    'Root – Movement – Outcome'
+    'What is visible – What is hidden – What is emerging'
   ]
 },
 prompt: {
