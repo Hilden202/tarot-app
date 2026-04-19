@@ -19,6 +19,11 @@ questions: {
     
 }
 
+scroll: {
+  title: string;
+  hint: string;
+};
+
 prompt: {
 interpretationHeader: string;
 header: string;
@@ -73,6 +78,10 @@ questions: {
     'Situation – Utmaning – Vägledning',
     'Vad är synligt – Vad är dolt – Vad håller på att ta form'
   ]
+},
+scroll: {
+  title: 'En fråga att utforska',
+  hint: 'Svep eller bläddra, tryck för att välja'
 },
 prompt: {
 interpretationHeader: 'Din tolkning',
@@ -137,6 +146,10 @@ questions: {
     'Situation – Challenge – Guidance',
     'What is visible – What is hidden – What is emerging'
   ]
+},
+scroll: {
+  title: 'Choose a thread to follow',
+  hint: 'Swipe or turn, tap to choose'
 },
 prompt: {
 interpretationHeader: 'Your interpretation',

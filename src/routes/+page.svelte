@@ -2,6 +2,7 @@
 	import TarotCard from '$lib/components/TarotCard.svelte';
 	import TarotPrompt from '$lib/components/TarotPrompt.svelte';
 	import TarotInterpretation from '$lib/components/TarotInterpretation.svelte';
+	import TarotScroll from '$lib/components/TarotScroll.svelte';
 	import { tarotDeck } from '$lib/data/tarotDeck';
 	import Button from '$lib/components/Button.svelte';
 	import type { TarotCardData } from '$lib/data/tarotDeck';
@@ -30,6 +31,7 @@
 
 	let selectedSuggestionIndex: number | null = null;
 	// Tracks whether the current question was auto-filled from suggestions
+	let scrollQuestionIndex = 0;
 
 	let previousCardCount: 1 | 2 | 3 = cardCount;
 	// Used to detect spread size changes
@@ -80,6 +82,7 @@
 			question = '';
 			selectedSuggestionIndex = null;
 		}
+		scrollQuestionIndex = 0;
 		previousCardCount = cardCount;
 	}
 
@@ -108,6 +111,8 @@
 		selectedCards = [];
 		flippedIds = new Set<string>();
 		question = '';
+		selectedSuggestionIndex = null;
+		scrollQuestionIndex = 0;
 		hasDrawn = false;
 		hasFetched = false;
 		interpretation = '';
@@ -246,21 +251,29 @@
 							}}
 							placeholder={t.page.questionPlaceholder}
 							disabled={hasDrawn}
-						/>
+						></textarea>
 					</label>
 					{#if !hasDrawn}
 						<div class="suggestions">
-							{#each visibleQuestions as q, index}
-								<button
-									type="button"
-									on:click={() => {
-										question = q;
-										selectedSuggestionIndex = index;
-									}}
-								>
-									{q}
-								</button>
-							{/each}
+							<TarotScroll
+								questions={visibleQuestions}
+								currentIndex={scrollQuestionIndex}
+								title={$language === 'sv' ? 'En fråga att utforska' : 'Choose a thread to follow'}
+								hint={$language === 'sv'
+									? 'Svep eller bläddra, tryck för att välja'
+									: 'Swipe or turn, tap to choose'}
+								ariaLabel={$language === 'sv'
+									? 'Interaktiv tarotrulle med frågor'
+									: 'Interactive tarot scroll of questions'}
+								on:change={(event) => {
+									scrollQuestionIndex = event.detail.index;
+								}}
+								on:select={(event) => {
+									question = event.detail.question;
+									scrollQuestionIndex = event.detail.index;
+									selectedSuggestionIndex = event.detail.index;
+								}}
+							/>
 						</div>
 					{/if}
 				</div>
@@ -280,10 +293,7 @@
 				{#if isLoading}
 					<p>Läser av korten...</p>
 				{:else if interpretation}
-					<TarotInterpretation
-						interpretation={interpretation}
-						displayedInterpretation={displayedInterpretation}
-					/>
+					<TarotInterpretation {interpretation} {displayedInterpretation} />
 				{:else}
 					<!-- fallback -->
 					<TarotPrompt {question} cards={selectedCards} />
@@ -493,27 +503,7 @@
 	}
 
 	.suggestions {
-		justify-content: flex-start;
-		display: flex;
-		flex-wrap: wrap;
-		gap: 0.5rem;
-		margin-top: 0.5rem;
-	}
-
-	.suggestions button {
-		background: var(--surface-color);
-		border: 1px solid var(--muted-color);
-		color: var(--text-color);
-		border-radius: 999px;
-		padding: 0.35rem 0.75rem;
-		font-size: 0.8rem;
-		cursor: pointer;
-		transition: all 0.2s ease;
-	}
-
-	.suggestions button:hover {
-		border-color: var(--card-border);
-		background: rgba(255, 255, 255, 0.05);
+		margin-top: 0.85rem;
 	}
 
 	.prompt {
