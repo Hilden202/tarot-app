@@ -100,7 +100,7 @@ export let ariaLabel = 'Tarot question scroll';
 		}
 
 		if (Math.abs(deltaY) > Math.abs(deltaX)) {
-			dragDistance = Math.max(-24, Math.min(24, deltaY * 0.18));
+			dragDistance = Math.max(-40, Math.min(40, deltaY * 0.35));
 		}
 	}
 
@@ -108,7 +108,7 @@ export let ariaLabel = 'Tarot question scroll';
 		if (!pointerActive) return;
 		pointerActive = false;
 
-		const threshold = 26;
+		const threshold = 18;
 
 		if (dragDistance <= -threshold) {
 			cycle(1);
@@ -245,6 +245,10 @@ export let ariaLabel = 'Tarot question scroll';
 		gap: 0.35rem;
 		padding: 0.7rem 0;
 		transform-style: preserve-3d;
+		user-select: none;
+		-webkit-user-select: none;
+		-ms-user-select: none;
+		touch-action: pan-y;
 	}
 
 	.scroll-face {
@@ -255,7 +259,6 @@ export let ariaLabel = 'Tarot question scroll';
 		cursor: pointer;
 		overflow: hidden;
 		transform:
-			translateY(var(--drag-y))
 			rotateX(var(--tilt-x))
 			rotateY(var(--tilt-y));
 		transition:
@@ -377,6 +380,7 @@ export let ariaLabel = 'Tarot question scroll';
 		align-items: center;
 		height: 3rem;
 		overflow: hidden;
+		will-change: transform;
 	}
 
 	.question-text {
@@ -391,6 +395,8 @@ export let ariaLabel = 'Tarot question scroll';
 		-webkit-line-clamp: 2;
 		-webkit-box-orient: vertical;
 		overflow: hidden;
+		transform: translateY(var(--drag-y));
+		transition: transform 120ms ease;
 	}
 
 	.hint {
