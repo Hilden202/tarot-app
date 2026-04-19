@@ -2,50 +2,63 @@
 
 Live: https://tarot.hildenmedia.se
 
-A small SvelteKit based tarot app MVP that explores tarot as a structured prompt generator for AI.
+A SvelteKit-based tarot app that blends ritual, reflection and AI.
+
+Instead of providing fixed interpretations, the app guides the user through a structured experience where tarot cards become a starting point for reflection — supported by AI.
+
+---
 
 ## Background
 
 The idea started after finding an unused tarot deck during a move.
-Instead of interpreting the cards myself, I began experimenting with using AI as a reflective tool.
 
-This app does not provide a fixed interpretation of the cards.
-Instead, it helps structure a question and generates a ready made prompt that can be used with any large language model.
+Rather than interpreting the cards traditionally, the focus shifted to using tarot as a framework for asking better questions.
 
-The intention is to keep the ritual, symbolism and pause that tarot offers, while letting AI assist with wording and perspective rather than authority.
+This project explores tarot as an interface:
+- for slowing down
+- for framing thoughts
+- and for generating meaningful reflections with AI
+
+---
 
 ## Features
 
-- Draw one to three tarot cards per session  
-- Flip cards individually  
-- Enter a question before drawing  
-- Generate an AI ready tarot reflection prompt  
-- Copy the prompt to the clipboard for use in any LLM  
+- Draw one to three tarot cards  
+- Interactive card flipping  
+- Guided question input (with scroll-based suggestions)  
+- AI-generated interpretation based on selected cards  
+- Fallback prompt generation if AI is unavailable  
+- Smooth, state-driven UI flow  
+
+---
 
 ## Design Principles
 
-- Tarot as a tool for reflection rather than prediction  
-- AI as a conversational mirror rather than an authority  
-- Minimal interface with focus on flow and presence  
-- No built in interpretation so the user stays in control  
+- Reflection over prediction  
+- AI as a mirror, not an authority  
+- Minimal friction, guided interaction  
+- Let the user stay in control of meaning  
+
+---
 
 ## Tech Stack
 
 - SvelteKit  
 - TypeScript  
-- Custom CSS styling  
-- Static deployment  
+- Custom CSS  
+- API-based AI integration  
+
+---
 
 ## Project Scope
 
-This project was built as a learning focused MVP with emphasis on:
+This project started as a learning MVP but evolved into an exploration of:
 
-- Clear component structure  
-- Predictable UI flow  
-- State driven interactions  
-- Exploring modern frontend development  
+- UX-driven flow design  
+- Human + AI interaction patterns  
+- Component-based architecture in Svelte  
 
-The scope is intentionally limited and opinionated.
+---
 
 ## Local Development
 
@@ -54,3 +67,4 @@ Install dependencies and start the development server.
 ```bash
 npm install
 npm run dev
+```
