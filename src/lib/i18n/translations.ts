@@ -45,7 +45,7 @@ export const translations: Record<Lang, TranslationSchema> = {
 sv: {
 page: {
 title: 'Tarotläggning',
-intro: 'Ta ett ögonblick, formulera en fråga och dra dina kort.',
+intro: 'Ställ en fråga, dra dina kort och få en reflekterande tolkning direkt. Ingen spådom – bara ett nytt perspektiv.',
 questionLabel: 'Din fråga:',
 questionPlaceholder: 'Vad vill du få vägledning kring just nu?',
 drawButton: (count: number) => `Dra ${count} kort`,
@@ -112,7 +112,7 @@ summary:
 en: {
 page: {
 title: 'Tarot Reading',
-intro: 'Take a moment, form your question and draw your cards.',
+intro: 'Ask a question, draw your cards and get a reflective interpretation instantly. No predictions — just a new perspective.',
 questionLabel: 'Your question:',
 questionPlaceholder: 'What would you like guidance on right now?',
 drawButton: (count: number) => `Draw ${count} cards`,
