@@ -1,6 +1,7 @@
 <script lang="ts">
 	import TarotCard from '$lib/components/TarotCard.svelte';
 	import TarotPrompt from '$lib/components/TarotPrompt.svelte';
+	import TarotInterpretation from '$lib/components/TarotInterpretation.svelte';
 	import { tarotDeck } from '$lib/data/tarotDeck';
 	import Button from '$lib/components/Button.svelte';
 	import type { TarotCardData } from '$lib/data/tarotDeck';
@@ -41,16 +42,7 @@
 	let displayedInterpretation: string = '';
 	let typingInterval: ReturnType<typeof setInterval> | null = null;
 
-	let copied = false;
-
 	let interpretationCache: Record<string, string> = {};
-
-	function copyInterpretation() {
-		if (!interpretation) return;
-		navigator.clipboard.writeText(interpretation);
-		copied = true;
-		setTimeout(() => copied = false, 2000);
-	}
 
 	function startTyping(text: string) {
 		if (typingInterval) {
@@ -283,20 +275,10 @@
 				{#if isLoading}
 					<p>Läser av korten...</p>
 				{:else if interpretation}
-					<div class="interpretation-box">
-						<div class="interpretation-header">
-							<h3>{t.prompt.interpretationHeader}</h3>
-							<button class="copy-btn" on:click={copyInterpretation}>
-								{copied ? t.prompt.copied : t.prompt.copy}
-							</button>
-						</div>
-
-						<div class="interpretation-content">
-							{#each displayedInterpretation.split('\n') as line}
-								<p>{line}</p>
-							{/each}
-						</div>
-					</div>
+					<TarotInterpretation
+						interpretation={interpretation}
+						displayedInterpretation={displayedInterpretation}
+					/>
 				{:else}
 					<!-- fallback -->
 					<TarotPrompt {question} cards={selectedCards} />
@@ -535,60 +517,5 @@
 		margin-left: auto;
 		margin-right: auto;
 		width: 100%;
-	}
-
-	.prompt > * {
-		background: var(--surface-color);
-		border-radius: 12px;
-	}
-
-	.interpretation-box {
-		background: var(--surface-color);
-		border-radius: 8px;
-		width: 100%;
-		max-width: 800px;
-		margin-left: auto;
-		margin-right: auto;
-		border: 1px solid var(--card-border);
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-		min-height: 160px;
-		display: flex;
-		flex-direction: column;
-	}
-
-	.interpretation-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		padding: 0.75rem 1rem;
-		border-bottom: 1px solid var(--muted-color);
-	}
-
-	.interpretation-header h3 {
-		margin: 0;
-		font-size: 1rem;
-	}
-
-	.copy-btn {
-		font-size: 0.85rem;
-		padding: 0.25rem 0.5rem;
-		cursor: pointer;
-		background: transparent;
-		border: 1px solid var(--muted-color);
-		color: var(--text-color);
-		border-radius: 6px;
-	}
-
-	.interpretation-content {
-		text-align: left;
-		padding: 1rem;
-		margin: 0;
-		line-height: 1.6;
-		flex: 1;
-		min-height: 100px;
-	}
-
-	.interpretation-content p {
-		margin: 0 0 0.6rem 0;
 	}
 </style>
