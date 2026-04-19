@@ -20,6 +20,7 @@ questions: {
 }
 
 prompt: {
+interpretationHeader: string;
 header: string;
 copy: string;
 copied: string;
@@ -77,6 +78,7 @@ questions: {
   ]
 },
 prompt: {
+interpretationHeader: 'Din tolkning',
 header: 'Tarotprompt – redo att kopiera',
 copy: 'Kopiera',
 copied: 'Kopierad ✓',
@@ -143,6 +145,7 @@ questions: {
   ]
 },
 prompt: {
+interpretationHeader: 'Your interpretation',
 header: 'Tarot prompt – ready to copy',
 copy: 'Copy',
 copied: 'Copied ✓',

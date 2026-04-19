@@ -7,6 +7,7 @@
 	import { base } from '$app/paths';
 	import { language } from '$lib/stores/language';
 	import { translations } from '$lib/i18n/translations';
+	import { interpretTarot } from '$lib/api/tarot';
 
 	const guideImage = 'intro/the_veil.png';
 
@@ -32,6 +33,44 @@
 	let previousCardCount: 1 | 2 | 3 = cardCount;
 	// Used to detect spread size changes
 
+	let interpretation: string = '';
+	let isLoading = false;
+	let error: string = '';
+	let hasFetched = false;
+
+	let displayedInterpretation: string = '';
+	let typingInterval: ReturnType<typeof setInterval> | null = null;
+
+	let copied = false;
+
+	let interpretationCache: Record<string, string> = {};
+
+	function copyInterpretation() {
+		if (!interpretation) return;
+		navigator.clipboard.writeText(interpretation);
+		copied = true;
+		setTimeout(() => copied = false, 2000);
+	}
+
+	function startTyping(text: string) {
+		if (typingInterval) {
+			clearInterval(typingInterval);
+		}
+
+		displayedInterpretation = '';
+		let index = 0;
+
+		typingInterval = setInterval(() => {
+			if (index < text.length) {
+				displayedInterpretation += text[index];
+				index++;
+			} else {
+				clearInterval(typingInterval!);
+				typingInterval = null;
+			}
+		}, 15);
+	}
+
 	$: t = translations[$language ?? 'sv'];
 
 	$: visibleQuestions = t.questions[cardCount].slice(0, 4);
@@ -52,11 +91,32 @@
 		previousCardCount = cardCount;
 	}
 
+	$: if (allCardsFlipped && !hasFetched && !isLoading) {
+		hasFetched = true;
+		fetchInterpretation();
+	}
+
+	$: if (allCardsFlipped && !isLoading && hasDrawn) {
+		const lang = $language ?? 'sv';
+
+		if (interpretationCache[lang]) {
+			interpretation = interpretationCache[lang];
+			startTyping(interpretation);
+		} else if (hasFetched) {
+			fetchInterpretation();
+		}
+	}
+
 	function resetDraw() {
 		selectedCards = [];
 		flippedIds = new Set<string>();
 		question = '';
 		hasDrawn = false;
+		hasFetched = false;
+		interpretation = '';
+		error = '';
+		isLoading = false;
+		interpretationCache = {};
 	}
 
 	function handleFlipChange(payload: { id: string; isFlipped: boolean }) {
@@ -94,6 +154,37 @@
 		// ersätt
 		selectedCards = returnSelected;
 		hasDrawn = true;
+	}
+
+	async function fetchInterpretation() {
+		if (!question.trim() || selectedCards.length === 0) return;
+
+		try {
+			isLoading = true;
+			error = '';
+			interpretation = '';
+
+			const result = await interpretTarot({
+				question,
+				cards: selectedCards.map((c) => c.shortName),
+				language: $language ?? 'sv'
+			});
+
+			interpretation = result?.interpretation ?? '';
+			const lang = $language ?? 'sv';
+			interpretationCache[lang] = interpretation;
+			startTyping(interpretation);
+			if (!interpretation) {
+				error = 'No interpretation returned';
+			}
+			setTimeout(() => {
+				document.querySelector('.prompt')?.scrollIntoView({ behavior: 'smooth' });
+			}, 50);
+		} catch (err) {
+			error = err instanceof Error ? err.message : 'Something went wrong';
+		} finally {
+			isLoading = false;
+		}
 	}
 </script>
 
@@ -187,10 +278,33 @@
 				{/if}
 			</div>
 		</section>
-
 		{#if allCardsFlipped}
 			<section class="prompt">
-				<TarotPrompt {question} cards={selectedCards} />
+				{#if isLoading}
+					<p>Läser av korten...</p>
+				{:else if interpretation}
+					<div class="interpretation-box">
+						<div class="interpretation-header">
+							<h3>{t.prompt.interpretationHeader}</h3>
+							<button class="copy-btn" on:click={copyInterpretation}>
+								{copied ? t.prompt.copied : t.prompt.copy}
+							</button>
+						</div>
+
+						<div class="interpretation-content">
+							{#each displayedInterpretation.split('\n') as line}
+								<p>{line}</p>
+							{/each}
+						</div>
+					</div>
+				{:else}
+					<!-- fallback -->
+					<TarotPrompt {question} cards={selectedCards} />
+
+					{#if error}
+						<p class="error">{error}</p>
+					{/if}
+				{/if}
 			</section>
 		{/if}
 	</div>
@@ -420,10 +534,61 @@
 		max-width: 800px;
 		margin-left: auto;
 		margin-right: auto;
+		width: 100%;
 	}
 
 	.prompt > * {
 		background: var(--surface-color);
 		border-radius: 12px;
+	}
+
+	.interpretation-box {
+		background: var(--surface-color);
+		border-radius: 8px;
+		width: 100%;
+		max-width: 800px;
+		margin-left: auto;
+		margin-right: auto;
+		border: 1px solid var(--card-border);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+		min-height: 160px;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.interpretation-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0.75rem 1rem;
+		border-bottom: 1px solid var(--muted-color);
+	}
+
+	.interpretation-header h3 {
+		margin: 0;
+		font-size: 1rem;
+	}
+
+	.copy-btn {
+		font-size: 0.85rem;
+		padding: 0.25rem 0.5rem;
+		cursor: pointer;
+		background: transparent;
+		border: 1px solid var(--muted-color);
+		color: var(--text-color);
+		border-radius: 6px;
+	}
+
+	.interpretation-content {
+		text-align: left;
+		padding: 1rem;
+		margin: 0;
+		line-height: 1.6;
+		flex: 1;
+		min-height: 100px;
+	}
+
+	.interpretation-content p {
+		margin: 0 0 0.6rem 0;
 	}
 </style>

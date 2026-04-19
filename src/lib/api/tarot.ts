@@ -9,6 +9,7 @@ export type TarotInterpretResponse = {
 };
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '';
+console.log('API_BASE:', API_BASE);
 if (!API_BASE) {
   console.warn('⚠️ VITE_API_BASE_URL is not set. Using same-origin fallback.');
 }
