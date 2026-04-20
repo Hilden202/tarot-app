@@ -181,6 +181,7 @@ export let ariaLabel = 'Tarot question scroll';
 		<div class="scroll-roll bottom" aria-hidden="true"></div>
 
 		<button
+			on:pointerdown|stopPropagation
 			type="button"
 			class="arrow arrow-up"
 			on:click|stopPropagation={() => cycle(-1)}
@@ -215,6 +216,7 @@ export let ariaLabel = 'Tarot question scroll';
 		</div>
 
 		<button
+			on:pointerdown|stopPropagation
 			type="button"
 			class="arrow arrow-down"
 			on:click|stopPropagation={() => cycle(1)}
