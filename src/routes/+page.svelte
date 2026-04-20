@@ -107,6 +107,13 @@
 		}
 	}
 
+	$: if (selectedCards.length > 0) {
+		selectedCards.forEach((card) => {
+			const img = new Image();
+			img.src = `${base}/tarot/cards/${card.image}`;
+		});
+	}
+
 	function resetDraw() {
 		selectedCards = [];
 		flippedIds = new Set<string>();
