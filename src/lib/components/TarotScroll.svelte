@@ -21,12 +21,18 @@
 	let dragDistance = 0;
 	let startY = 0;
 	let startX = 0;
+	let lastY = 0;
+	let lastTime = 0;
+	let velocityY = 0;
 	let pointerActive = false;
 	let moved = false;
 	let stageElement: HTMLDivElement | null = null;
 	let isSettling = false;
 	let animationFrame: ReturnType<typeof setTimeout> | null = null;
 	const settleDuration = 180;
+
+	let inertiaVelocity = 0;
+	let inertiaFrame: number | null = null;
 
 	$: totalQuestions = questions.length;
 	$: if (totalQuestions === 0) {
@@ -85,11 +91,18 @@
 		if (disabled || isSettling || totalQuestions < 2) return;
 		clearAnimationFrame();
 		isSettling = false;
+		if (inertiaFrame) {
+			cancelAnimationFrame(inertiaFrame);
+			inertiaFrame = null;
+		}
 		pointerActive = true;
 		moved = false;
 		dragDistance = 0;
 		startY = event.clientY;
 		startX = event.clientX;
+		lastY = event.clientY;
+		lastTime = performance.now();
+		velocityY = 0;
 	}
 
 	function handlePointerMove(event: PointerEvent) {
@@ -114,6 +127,13 @@
 		if (!pointerActive) return;
 
 		const deltaY = event.clientY - startY;
+		const now = performance.now();
+		const dt = now - lastTime;
+		if (dt > 0) {
+			velocityY = (event.clientY - lastY) / dt;
+			lastY = event.clientY;
+			lastTime = now;
+		}
 		const deltaX = event.clientX - startX;
 
 		if (Math.abs(deltaY) > 6 || Math.abs(deltaX) > 6) {
@@ -130,7 +150,15 @@
 		pointerActive = false;
 
 		const threshold = getStageDistance() * 0.25;
+		const velocityThreshold = 0.5; // tweakable
 
+		// Fast swipe overrides distance
+		if (Math.abs(velocityY) > velocityThreshold) {
+			startInertia();
+			return;
+		}
+
+		// Fallback to distance-based logic
 		if (dragDistance <= -threshold) {
 			startSettle(1);
 			return;
@@ -141,7 +169,49 @@
 			return;
 		}
 
+
 		dragDistance = 0;
+	}
+
+	function startInertia() {
+		if (inertiaFrame) cancelAnimationFrame(inertiaFrame);
+
+		inertiaVelocity = velocityY * 20; // amplify swipe
+
+		function step() {
+			// apply friction
+			inertiaVelocity *= 0.95;
+
+			// move scroll
+			dragDistance += inertiaVelocity;
+
+			const limit = getStageDistance();
+
+			// step forward
+			if (dragDistance <= -limit) {
+				dragDistance += limit;
+				currentIndex = (currentIndex + 1 + totalQuestions) % totalQuestions;
+				emitChange();
+			}
+
+			// step backward
+			if (dragDistance >= limit) {
+				dragDistance -= limit;
+				currentIndex = (currentIndex - 1 + totalQuestions) % totalQuestions;
+				emitChange();
+			}
+
+			// stop condition
+			if (Math.abs(inertiaVelocity) < 0.1) {
+				dragDistance = 0;
+				inertiaFrame = null;
+				return;
+			}
+
+			inertiaFrame = requestAnimationFrame(step);
+		}
+
+		inertiaFrame = requestAnimationFrame(step);
 	}
 
 	function resetTilt(event: PointerEvent) {
@@ -178,6 +248,7 @@
 
 	onDestroy(() => {
 		clearAnimationFrame();
+		if (inertiaFrame) cancelAnimationFrame(inertiaFrame);
 	});
 </script>
 
