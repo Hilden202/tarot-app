@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
-	import { cubicOut } from 'svelte/easing';
-	import type { TransitionConfig } from 'svelte/transition';
+	import { createEventDispatcher, onDestroy } from 'svelte';
 
 	type ScrollEventDetail = {
 		index: number;
@@ -20,12 +18,15 @@
 		select: ScrollEventDetail;
 	}>();
 
-	let direction: 1 | -1 = 1;
 	let dragDistance = 0;
 	let startY = 0;
 	let startX = 0;
 	let pointerActive = false;
 	let moved = false;
+	let stageElement: HTMLDivElement | null = null;
+	let isSettling = false;
+	let animationFrame: ReturnType<typeof setTimeout> | null = null;
+	const settleDuration = 180;
 
 	$: totalQuestions = questions.length;
 	$: if (totalQuestions === 0) {
@@ -35,21 +36,10 @@
 	}
 
 	$: currentQuestion = questions[currentIndex] ?? '';
-
-	function mysticShift(
-		node: Element,
-		params: { y?: number; delay?: number } = {}
-	): TransitionConfig {
-		const y = params.y ?? 28;
-		const delay = params.delay ?? 0;
-
-		return {
-			delay,
-			duration: 360,
-			easing: cubicOut,
-			css: (t) => `opacity:${t}; --anim-y:${(1 - t) * y}px;`
-		};
-	}
+	$: prevIndex = totalQuestions > 0 ? (currentIndex - 1 + totalQuestions) % totalQuestions : 0;
+	$: nextIndex = totalQuestions > 0 ? (currentIndex + 1) % totalQuestions : 0;
+	$: prevQuestion = questions[prevIndex] ?? '';
+	$: nextQuestion = questions[nextIndex] ?? '';
 
 	function emitChange() {
 		dispatch('change', { index: currentIndex, question: currentQuestion });
@@ -57,19 +47,44 @@
 
 	function cycle(step: 1 | -1) {
 		if (disabled || totalQuestions < 2) return;
-		direction = step;
-		currentIndex = (currentIndex + step + totalQuestions) % totalQuestions;
-		dragDistance = 0;
-		emitChange();
+		startSettle(step);
+	}
+
+	function clearAnimationFrame() {
+		if (animationFrame) {
+			clearTimeout(animationFrame);
+			animationFrame = null;
+		}
+	}
+
+	function getStageDistance() {
+		return stageElement?.getBoundingClientRect().height ?? 48;
+	}
+
+	function startSettle(step: 1 | -1) {
+		if (isSettling) return;
+
+		isSettling = true;
+		dragDistance = -step * getStageDistance();
+		clearAnimationFrame();
+		animationFrame = setTimeout(() => {
+			currentIndex = (currentIndex + step + totalQuestions) % totalQuestions;
+			dragDistance = 0;
+			isSettling = false;
+			animationFrame = null;
+			emitChange();
+		}, settleDuration);
 	}
 
 	function selectCurrent() {
-		if (disabled || !currentQuestion) return;
+		if (disabled || isSettling || !currentQuestion) return;
 		dispatch('select', { index: currentIndex, question: currentQuestion });
 	}
 
 	function handlePointerDown(event: PointerEvent) {
-		if (disabled || totalQuestions < 2) return;
+		if (disabled || isSettling || totalQuestions < 2) return;
+		clearAnimationFrame();
+		isSettling = false;
 		pointerActive = true;
 		moved = false;
 		dragDistance = 0;
@@ -114,15 +129,15 @@
 		if (!pointerActive) return;
 		pointerActive = false;
 
-		const threshold = 18;
+		const threshold = getStageDistance() * 0.25;
 
 		if (dragDistance <= -threshold) {
-			cycle(1);
+			startSettle(1);
 			return;
 		}
 
 		if (dragDistance >= threshold) {
-			cycle(-1);
+			startSettle(-1);
 			return;
 		}
 
@@ -160,6 +175,10 @@
 			selectCurrent();
 		}
 	}
+
+	onDestroy(() => {
+		clearAnimationFrame();
+	});
 </script>
 
 <div class="tarot-scroll-wrap">
@@ -201,16 +220,30 @@
 			<div class="question-frame">
 				<p class="eyebrow">{title}</p>
 
-				<div class="question-stage">
-					{#key `${currentIndex}-${currentQuestion}`}
-						<p
-							class="question-text"
-							in:mysticShift={{ y: direction > 0 ? 28 : -28 }}
-							out:mysticShift={{ y: direction > 0 ? -28 : 28 }}
-						>
-							{currentQuestion}
-						</p>
-					{/key}
+				<div class="question-stage" bind:this={stageElement}>
+					<div
+						class="question-slot"
+						class:settling={isSettling}
+						style={`--base-offset:-100%; --drag-y:${dragDistance}px;`}
+						aria-hidden="true"
+					>
+						<p class="question-text">{prevQuestion}</p>
+					</div>
+					<div
+						class="question-slot"
+						class:settling={isSettling}
+						style={`--base-offset:0%; --drag-y:${dragDistance}px;`}
+					>
+						<p class="question-text">{currentQuestion}</p>
+					</div>
+					<div
+						class="question-slot"
+						class:settling={isSettling}
+						style={`--base-offset:100%; --drag-y:${dragDistance}px;`}
+						aria-hidden="true"
+					>
+						<p class="question-text">{nextQuestion}</p>
+					</div>
 				</div>
 
 				<p class="hint">{hint}</p>
@@ -391,14 +424,18 @@
 		overflow: hidden;
 	}
 
-	.question-stage > * {
+	.question-slot {
 		position: absolute;
-		top: 50%;
-		left: 0;
-		right: 0;
-		transform: translateY(calc(-50% + var(--anim-y, 0px) + var(--drag-y, 0px)));
-		transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transform: translateY(calc(var(--base-offset, 0%) + var(--drag-y, 0px)));
 		will-change: transform;
+	}
+
+	.question-slot.settling {
+		transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
 	}
 
 	.question-text {
@@ -522,6 +559,10 @@
 		.rune-glow {
 			transition: none;
 			animation: none;
+		}
+
+		.question-slot.settling {
+			transition: none;
 		}
 	}
 </style>
