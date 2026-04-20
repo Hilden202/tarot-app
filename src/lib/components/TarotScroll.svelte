@@ -8,12 +8,12 @@
 		question: string;
 	};
 
-export let questions: string[] = [];
-export let currentIndex = 0;
-export let hint = 'Swipe to wander, tap to choose';
-export let title = 'Choose a thread to follow';
-export let disabled = false;
-export let ariaLabel = 'Tarot question scroll';
+	export let questions: string[] = [];
+	export let currentIndex = 0;
+	export let hint = 'Swipe to wander, tap to choose';
+	export let title = 'Choose a thread to follow';
+	export let disabled = false;
+	export let ariaLabel = 'Tarot question scroll';
 
 	const dispatch = createEventDispatcher<{
 		change: ScrollEventDetail;
@@ -26,8 +26,6 @@ export let ariaLabel = 'Tarot question scroll';
 	let startX = 0;
 	let pointerActive = false;
 	let moved = false;
-	let glowX = 50;
-	let glowY = 50;
 
 	$: totalQuestions = questions.length;
 	$: if (totalQuestions === 0) {
@@ -38,16 +36,18 @@ export let ariaLabel = 'Tarot question scroll';
 
 	$: currentQuestion = questions[currentIndex] ?? '';
 
-	function mysticShift(node: Element, params: { y?: number; delay?: number } = {}): TransitionConfig {
-		const y = params.y ?? 14;
+	function mysticShift(
+		node: Element,
+		params: { y?: number; delay?: number } = {}
+	): TransitionConfig {
+		const y = params.y ?? 28;
 		const delay = params.delay ?? 0;
 
 		return {
 			delay,
-			duration: 320,
+			duration: 360,
 			easing: cubicOut,
-			css: (t, u) =>
-				`opacity:${t}; transform: translate3d(0, ${u * y}px, 0) scale(${0.985 + t * 0.015}); filter: blur(${u * 1.5}px);`
+			css: (t) => `opacity:${t}; --anim-y:${(1 - t) * y}px;`
 		};
 	}
 
@@ -71,7 +71,6 @@ export let ariaLabel = 'Tarot question scroll';
 	function handlePointerDown(event: PointerEvent) {
 		if (disabled || totalQuestions < 2) return;
 		pointerActive = true;
-		(event.currentTarget as HTMLElement)?.setPointerCapture(event.pointerId);
 		moved = false;
 		dragDistance = 0;
 		startY = event.clientY;
@@ -83,12 +82,18 @@ export let ariaLabel = 'Tarot question scroll';
 
 		if (currentTarget) {
 			const rect = currentTarget.getBoundingClientRect();
-			glowX = ((event.clientX - rect.left) / rect.width) * 100;
-			glowY = ((event.clientY - rect.top) / rect.height) * 100;
-			currentTarget.style.setProperty('--pointer-x', `${glowX}%`);
-			currentTarget.style.setProperty('--pointer-y', `${glowY}%`);
-			currentTarget.style.setProperty('--tilt-x', `${((event.clientY - rect.top) / rect.height - 0.5) * -3}deg`);
-			currentTarget.style.setProperty('--tilt-y', `${((event.clientX - rect.left) / rect.width - 0.5) * 4}deg`);
+			const pointerX = ((event.clientX - rect.left) / rect.width) * 100;
+			const pointerY = ((event.clientY - rect.top) / rect.height) * 100;
+			currentTarget.style.setProperty('--pointer-x', `${pointerX}%`);
+			currentTarget.style.setProperty('--pointer-y', `${pointerY}%`);
+			currentTarget.style.setProperty(
+				'--tilt-x',
+				`${((event.clientY - rect.top) / rect.height - 0.5) * -3}deg`
+			);
+			currentTarget.style.setProperty(
+				'--tilt-y',
+				`${((event.clientX - rect.left) / rect.width - 0.5) * 4}deg`
+			);
 		}
 
 		if (!pointerActive) return;
@@ -107,9 +112,6 @@ export let ariaLabel = 'Tarot question scroll';
 
 	function finishGesture(event?: PointerEvent) {
 		if (!pointerActive) return;
-		try {
-			(event?.currentTarget as HTMLElement)?.releasePointerCapture?.(event.pointerId);
-		} catch {}
 		pointerActive = false;
 
 		const threshold = 18;
@@ -184,7 +186,7 @@ export let ariaLabel = 'Tarot question scroll';
 			on:pointerdown|stopPropagation
 			type="button"
 			class="arrow arrow-up"
-			on:click|stopPropagation={() => cycle(-1)}
+			on:click|stopPropagation={() => cycle(1)}
 			aria-label="Previous question"
 			disabled={disabled || totalQuestions < 2}
 		>
@@ -203,8 +205,8 @@ export let ariaLabel = 'Tarot question scroll';
 					{#key `${currentIndex}-${currentQuestion}`}
 						<p
 							class="question-text"
-							in:mysticShift={{ y: direction > 0 ? 20 : -20 }}
-							out:mysticShift={{ y: direction > 0 ? -20 : 20 }}
+							in:mysticShift={{ y: direction > 0 ? 28 : -28 }}
+							out:mysticShift={{ y: direction > 0 ? -28 : 28 }}
 						>
 							{currentQuestion}
 						</p>
@@ -219,7 +221,7 @@ export let ariaLabel = 'Tarot question scroll';
 			on:pointerdown|stopPropagation
 			type="button"
 			class="arrow arrow-down"
-			on:click|stopPropagation={() => cycle(1)}
+			on:click|stopPropagation={() => cycle(-1)}
 			aria-label="Next question"
 			disabled={disabled || totalQuestions < 2}
 		>
@@ -230,8 +232,8 @@ export let ariaLabel = 'Tarot question scroll';
 
 <style>
 	:global(:root) {
-		--tarot-scroll-font: 'Cormorant Garamond', 'Iowan Old Style', 'Palatino Linotype', Georgia,
-			serif;
+		--tarot-scroll-font:
+			'Cormorant Garamond', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
 	}
 
 	.tarot-scroll-wrap {
@@ -265,15 +267,17 @@ export let ariaLabel = 'Tarot question scroll';
 		border-radius: 1.2rem;
 		cursor: pointer;
 		overflow: hidden;
-		transform:
-			rotateX(var(--tilt-x))
-			rotateY(var(--tilt-y));
+		transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
 		transition:
-			transform 220ms ease,
-			box-shadow 220ms ease,
-			filter 220ms ease;
+			transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+			box-shadow 260ms ease,
+			filter 260ms ease;
 		background:
-			radial-gradient(circle at var(--pointer-x) var(--pointer-y), rgba(255, 248, 220, 0.75), transparent 34%),
+			radial-gradient(
+				circle at var(--pointer-x) var(--pointer-y),
+				rgba(255, 248, 220, 0.75),
+				transparent 34%
+			),
 			linear-gradient(180deg, #eedfba 0%, #e6d2ac 42%, #dcc294 100%);
 		box-shadow:
 			inset 0 1px 0 rgba(255, 252, 240, 0.75),
@@ -358,13 +362,12 @@ export let ariaLabel = 'Tarot question scroll';
 			radial-gradient(circle at 22% 22%, rgba(255, 243, 198, 0.4), transparent 12%),
 			radial-gradient(circle at 82% 74%, rgba(255, 236, 182, 0.28), transparent 10%);
 		opacity: 0.85;
-		animation: shimmer 7s ease-in-out infinite;
+		animation: shimmer 9s ease-in-out infinite;
 	}
 
 	.question-frame {
 		position: relative;
 		z-index: 1;
-		height: 100%;
 		min-height: 3.2rem;
 		display: flex;
 		flex-direction: column;
@@ -383,10 +386,18 @@ export let ariaLabel = 'Tarot question scroll';
 	}
 
 	.question-stage {
-		display: grid;
-		align-items: center;
+		position: relative;
 		height: 3rem;
 		overflow: hidden;
+	}
+
+	.question-stage > * {
+		position: absolute;
+		top: 50%;
+		left: 0;
+		right: 0;
+		transform: translateY(calc(-50% + var(--anim-y, 0px) + var(--drag-y, 0px)));
+		transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
 		will-change: transform;
 	}
 
@@ -402,8 +413,6 @@ export let ariaLabel = 'Tarot question scroll';
 		-webkit-line-clamp: 2;
 		-webkit-box-orient: vertical;
 		overflow: hidden;
-		transform: translateY(var(--drag-y));
-		transition: transform 120ms ease;
 	}
 
 	.hint {
