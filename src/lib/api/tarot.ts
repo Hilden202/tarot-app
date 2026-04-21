@@ -2,6 +2,7 @@ export type TarotInterpretRequest = {
   question: string;
   cards: string[];
   language: string;
+  mode?: 'soft' | 'direct';
 };
 
 export type TarotInterpretResponse = {

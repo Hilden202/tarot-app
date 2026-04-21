@@ -185,7 +185,8 @@ onMount(() => {
 			const result = await interpretTarot({
 				question,
 				cards: selectedCards.map((c) => c.shortName),
-				language: $language ?? 'sv'
+				language: $language ?? 'sv',
+				mode
 			});
 
 			interpretation = result?.interpretation ?? '';
