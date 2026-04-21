@@ -10,13 +10,16 @@ drawButton: (count: number) => string;
 resetButton: string;
 cardCountLabel: (count: number) => string;
 progress: (flipped: number, total: number) => string;
+modeLabel: string;
+modeSoft: string;
+modeDirect: string;
 };
 
 questions: {
         1: string[];
         2: string[];
         3: string[];
-}
+};
 
 scroll: {
   title: string;
@@ -61,7 +64,10 @@ cardCountLabel: (count: number) =>
 count === 1 ? '1 kort' : `${count} kort`,
 
 progress: (flipped: number, total: number) =>
-`${flipped} / ${total} kort uppvända`
+`${flipped} / ${total} kort uppvända`,
+modeLabel: 'Hur vill du höra detta?',
+modeSoft: 'Mjukt',
+modeDirect: 'Rakt'
 },
 questions: {
   1: [
@@ -133,7 +139,10 @@ cardCountLabel: (count: number) =>
 count === 1 ? '1 card' : `${count} cards`,
 
 progress: (flipped: number, total: number) =>
-`${flipped} / ${total} cards revealed`
+`${flipped} / ${total} cards revealed`,
+modeLabel: 'How do you want to hear this?',
+modeSoft: 'Soft',
+modeDirect: 'Direct'
 },
 questions: {
   1: [

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import TarotCard from '$lib/components/TarotCard.svelte';
-	import TarotPrompt from '$lib/components/TarotPrompt.svelte';
 	import TarotInterpretation from '$lib/components/TarotInterpretation.svelte';
 	import TarotScroll from '$lib/components/TarotScroll.svelte';
 	import { tarotDeck } from '$lib/data/tarotDeck';
@@ -38,22 +37,22 @@
 	let previousCardCount: 1 | 2 | 3 = cardCount;
 	// Used to detect spread size changes
 
-let interpretation: string = '';
-let isLoading = false;
-let error: string = '';
-let hasFetched = false;
+	let interpretation: string = '';
+	let isLoading = false;
+	let error: string = '';
+	let hasSelectedMode = false;
 
-let displayedInterpretation: string = '';
-let typingInterval: ReturnType<typeof setInterval> | null = null;
+	let displayedInterpretation: string = '';
+	let typingInterval: ReturnType<typeof setInterval> | null = null;
 
-let interpretationCache: Record<string, string> = {};
+	let interpretationCache: Record<string, Record<string, string>> = {};
 
-let mode: 'soft' | 'direct' = 'soft';
+	let mode: 'soft' | 'direct' = 'soft';
 
-onMount(() => {
-  const img = new Image();
-  img.src = `${base}/${cardBackImage}`;
-});
+	onMount(() => {
+		const img = new Image();
+		img.src = `${base}/${cardBackImage}`;
+	});
 
 	function startTyping(text: string) {
 		if (typingInterval) {
@@ -95,26 +94,7 @@ onMount(() => {
 		previousCardCount = cardCount;
 	}
 
-	$: if (allCardsFlipped && !isLoading && hasDrawn) {
-		const lang = $language ?? 'sv';
-
-		if (interpretationCache[lang]) {
-			interpretation = interpretationCache[lang];
-			startTyping(interpretation);
-		} else if (!hasFetched) {
-			hasFetched = true;
-			fetchInterpretation();
-		}
-	}
-
-	$: if (allCardsFlipped && hasDrawn) {
-		const lang = $language ?? 'sv';
-
-		// Reset fetch flag if switching to a language we don't have cached yet
-		if (!interpretationCache[lang]) {
-			hasFetched = false;
-		}
-	}
+	// Removed reactive block for allCardsFlipped && !isLoading && hasDrawn && hasFetched
 
 	$: if (selectedCards.length > 0) {
 		selectedCards.forEach((card) => {
@@ -130,7 +110,7 @@ onMount(() => {
 		selectedSuggestionIndex = null;
 		scrollQuestionIndex = 0;
 		hasDrawn = false;
-		hasFetched = false;
+		hasSelectedMode = false;
 		interpretation = '';
 		error = '';
 		isLoading = false;
@@ -150,6 +130,18 @@ onMount(() => {
 	}
 
 	$: allCardsFlipped = selectedCards.length > 0 && flippedIds.size === selectedCards.length;
+
+	$: if (allCardsFlipped && hasDrawn && hasSelectedMode && !isLoading) {
+		const lang = $language ?? 'sv';
+		const cachedInterpretation = interpretationCache[lang]?.[mode];
+
+		if (cachedInterpretation && interpretation !== cachedInterpretation) {
+			interpretation = cachedInterpretation;
+			startTyping(interpretation);
+		} else if (!cachedInterpretation && !isLoading) {
+			fetchInterpretation();
+		}
+	}
 
 	function newCards() {
 		// reset
@@ -174,8 +166,25 @@ onMount(() => {
 		hasDrawn = true;
 	}
 
+	function selectMode(selected: 'soft' | 'direct') {
+		mode = selected;
+		hasSelectedMode = true;
+
+		const lang = $language ?? 'sv';
+		const cachedInterpretation = interpretationCache[lang]?.[mode];
+
+		if (cachedInterpretation) {
+			interpretation = cachedInterpretation;
+			startTyping(interpretation);
+			return;
+		}
+
+		fetchInterpretation();
+	}
+
 	async function fetchInterpretation() {
 		if (!question.trim() || selectedCards.length === 0) return;
+		if (!hasSelectedMode) return;
 
 		try {
 			isLoading = true;
@@ -191,7 +200,8 @@ onMount(() => {
 
 			interpretation = result?.interpretation ?? '';
 			const lang = $language ?? 'sv';
-			interpretationCache[lang] = interpretation;
+			if (!interpretationCache[lang]) interpretationCache[lang] = {};
+			interpretationCache[lang][mode] = interpretation;
 			startTyping(interpretation);
 			if (!interpretation) {
 				error = 'No interpretation returned';
@@ -307,17 +317,34 @@ onMount(() => {
 		</section>
 		{#if allCardsFlipped}
 			<section class="prompt">
-				{#if isLoading}
-					<p>Läser av korten...</p>
-				{:else if interpretation}
-					<TarotInterpretation {interpretation} {displayedInterpretation} {mode} />
-				{:else}
-					<!-- fallback -->
-					<TarotPrompt {question} cards={selectedCards} />
+				<div class="mode-select">
+					<p>{t.page.modeLabel}</p>
 
-					{#if error}
-						<p class="error">{error}</p>
-					{/if}
+					<div class="mode-buttons">
+						<Button 
+							on:click={() => selectMode('soft')}
+							disabled={isLoading}
+							class={mode === 'soft' ? 'active' : ''}>
+							😇 {t.page.modeSoft}
+						</Button>
+
+						<Button 
+							on:click={() => selectMode('direct')}
+							disabled={isLoading}
+							class={mode === 'direct' ? 'active' : ''}>
+							😈 {t.page.modeDirect}
+						</Button>
+					</div>
+				</div>
+
+				{#if isLoading && !interpretation}
+					<p class="loading">Läser av korten...</p>
+				{/if}
+
+				{#if interpretation}
+					<TarotInterpretation {interpretation} {displayedInterpretation} {mode} />
+				{:else if error}
+					<p class="error">{error}</p>
 				{/if}
 			</section>
 		{/if}
@@ -529,5 +556,34 @@ onMount(() => {
 		margin-left: auto;
 		margin-right: auto;
 		width: 100%;
+	}
+	.loading {
+		text-align: center;
+		font-size: 0.9rem;
+		color: var(--muted-color);
+		margin-bottom: 0.5rem;
+	}
+	.mode-select {
+		text-align: center;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		margin-bottom: 1rem;
+	}
+
+	.mode-buttons {
+		display: flex;
+		gap: 0.5rem;
+		justify-content: center;
+	}
+
+	.mode-buttons button {
+		flex: 1;
+		max-width: 180px;
+	}
+
+	.mode-buttons button.active {
+		outline: 1px solid var(--accent-light);
+		background: var(--surface-color);
 	}
 </style>
