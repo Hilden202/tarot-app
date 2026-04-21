@@ -1,14 +1,18 @@
-
-
 <script lang="ts">
 	import { language } from '$lib/stores/language';
 	import { translations } from '$lib/i18n/translations';
 
 	export let interpretation: string = '';
 	export let displayedInterpretation: string = '';
+	export let mode: 'soft' | 'direct' = 'soft';
 
 	let t;
 	$: t = translations[$language ?? 'sv'];
+
+	$: disclaimer =
+		mode === 'direct'
+			? t.prompt.interpretationDisclaimerDirect
+			: t.prompt.interpretationDisclaimerSoft;
 
 	let copied = false;
 
@@ -31,6 +35,8 @@
 			{copied ? t.prompt.copied : t.prompt.copy}
 		</button>
 	</div>
+
+	<p class="disclaimer">{disclaimer}</p>
 
 	<div class="interpretation-content">
 		{#each displayedInterpretation.split('\n') as line}
@@ -88,5 +94,12 @@
 
 	.interpretation-content p {
 		margin: 0 0 0.6rem 0;
+	}
+
+	.disclaimer {
+		margin: 0.5rem 1rem 1rem;
+		font-size: 0.75rem;
+		color: var(--muted-color);
+		text-align: center;
 	}
 </style>

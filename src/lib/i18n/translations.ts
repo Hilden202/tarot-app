@@ -16,7 +16,6 @@ questions: {
         1: string[];
         2: string[];
         3: string[];
-    
 }
 
 scroll: {
@@ -30,6 +29,8 @@ header: string;
 copy: string;
 copied: string;
 disclaimer: string;
+interpretationDisclaimerSoft: string;
+interpretationDisclaimerDirect: string;
 
 title: string;
 questionIntro: string;
@@ -88,8 +89,12 @@ interpretationHeader: 'Din tolkning',
 header: 'Tarotprompt – redo att kopiera',
 copy: 'Kopiera',
 copied: 'Kopierad ✓',
-disclaimer:
-'Frågan och tolkningen skapas av dig. Verktyget hjälper endast till att formulera en strukturerad tarot-prompt för reflektion eller vidare tolkning.',
+    disclaimer:
+    'Frågan och tolkningen skapas av dig. Verktyget hjälper endast till att formulera en strukturerad tarot-prompt för reflektion eller vidare tolkning.',
+    interpretationDisclaimerSoft:
+    'En reflekterande tolkning baserad på korten. Ta till dig det som känns relevant och låt resten passera.',
+    interpretationDisclaimerDirect:
+    'Denna tolkning ger en tydlig riktning baserad på korten. Den är inte absolut sanning, men den undviker inte att ge ett konkret svar.',
 
 title: 'Tarotläggning – tolkning önskas',
 questionIntro: 'Jag har ställt följande fråga:',
@@ -156,8 +161,12 @@ interpretationHeader: 'Your interpretation',
 header: 'Tarot prompt – ready to copy',
 copy: 'Copy',
 copied: 'Copied ✓',
-disclaimer:
-'The question and interpretation are created by you. The tool only helps structure a tarot prompt for reflection or further interpretation.',
+    disclaimer:
+    'The question and interpretation are created by you. The tool only helps structure a tarot prompt for reflection or further interpretation.',
+    interpretationDisclaimerSoft:
+    'This interpretation is meant for reflection. Take what resonates and leave the rest.',
+    interpretationDisclaimerDirect:
+    'This interpretation offers a clear direction based on the cards. It is not absolute truth, but it does not avoid giving a concrete answer.',
 
 title: 'Tarot reading – interpretation requested',
 
