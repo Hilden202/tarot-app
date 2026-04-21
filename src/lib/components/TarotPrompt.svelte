@@ -5,6 +5,7 @@
 
 	export let cards: TarotCardData[];
 	export let question: string;
+	export let mode: 'soft' | 'direct' = 'soft';
 
 	let t: (typeof translations)['sv'];
 	let promptText: string;
@@ -23,9 +24,13 @@
 	}
 
 	function getInterpretationFrame(cardCount: number) {
-		if (cardCount === 1) return t.prompt.frames.one;
-		if (cardCount === 2) return t.prompt.frames.two;
-		return t.prompt.frames.three;
+		const frames = mode === 'direct'
+			? t.prompt.directFrames
+			: t.prompt.frames;
+
+		if (cardCount === 1) return frames.one;
+		if (cardCount === 2) return frames.two;
+		return frames.three;
 	}
 
 	$: promptText = `${t.prompt.title}
@@ -38,7 +43,7 @@
 
 	${getInterpretationFrame(cards.length)}
 
-	${t.prompt.tone}
+	${mode === 'direct' ? t.prompt.directTone : t.prompt.tone}
 
 	${t.prompt.summary}`;
 </script>
@@ -52,7 +57,11 @@
 		</button>
 	</div>
 
-	<p class="disclaimer">{t.prompt.disclaimer}</p>
+	<p class="disclaimer">
+		{t.prompt.disclaimer.base}
+		<br />
+		{mode === 'direct' ? t.prompt.disclaimer.direct : t.prompt.disclaimer.soft}
+	</p>
 
 	<div class="prompt-content">
 		{#each promptText.split('\n') as line}

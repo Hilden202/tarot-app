@@ -11,8 +11,8 @@
 
 	$: disclaimer =
 		mode === 'direct'
-			? t.prompt.interpretationDisclaimerDirect
-			: t.prompt.interpretationDisclaimerSoft;
+			? t.prompt.disclaimer.direct
+			: t.prompt.disclaimer.soft;
 
 	let copied = false;
 

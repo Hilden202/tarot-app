@@ -10,6 +10,7 @@
 	import { translations } from '$lib/i18n/translations';
 	import { interpretTarot } from '$lib/api/tarot';
 	import { onMount } from 'svelte';
+	import TarotPrompt from '$lib/components/TarotPrompt.svelte';
 
 	const guideImage = 'intro/the_veil.png';
 	const cardBackImage = 'tarot/back/TarotKort_Baksida.png';
@@ -46,8 +47,11 @@
 	let typingInterval: ReturnType<typeof setInterval> | null = null;
 
 	let interpretationCache: Record<string, Record<string, string>> = {};
+	let activeFetchKey = '';
+	let loadedInterpretationKey = '';
+	let failedInterpretationKey = '';
 
-	let mode: 'soft' | 'direct' = 'soft';
+let mode: 'soft' | 'direct' | null = null;
 
 	onMount(() => {
 		const img = new Image();
@@ -71,6 +75,42 @@
 				typingInterval = null;
 			}
 		}, 15);
+	}
+
+	function stopTyping() {
+		if (typingInterval) {
+			clearInterval(typingInterval);
+			typingInterval = null;
+		}
+	}
+
+	function getInterpretationKey(
+		lang: 'sv' | 'en' = $language ?? 'sv',
+		selectedMode: 'soft' | 'direct' = mode ?? 'soft'
+	) {
+		return [
+			drawId,
+			lang,
+			selectedMode,
+			question.trim(),
+			selectedCards.map((card) => card.id).join(',')
+		].join('|');
+	}
+
+	function clearInterpretationState() {
+		stopTyping();
+		interpretation = '';
+		displayedInterpretation = '';
+		error = '';
+	}
+
+	function showCachedInterpretation(cachedInterpretation: string, key: string) {
+		error = '';
+		isLoading = false;
+		failedInterpretationKey = '';
+		loadedInterpretationKey = key;
+		interpretation = cachedInterpretation;
+		startTyping(cachedInterpretation);
 	}
 
 	$: t = translations[$language ?? 'sv'];
@@ -104,6 +144,7 @@
 	}
 
 	function resetDraw() {
+		stopTyping();
 		selectedCards = [];
 		flippedIds = new Set<string>();
 		question = '';
@@ -115,6 +156,10 @@
 		error = '';
 		isLoading = false;
 		interpretationCache = {};
+		activeFetchKey = '';
+		loadedInterpretationKey = '';
+		failedInterpretationKey = '';
+		displayedInterpretation = '';
 	}
 
 	function handleFlipChange(payload: { id: string; isFlipped: boolean }) {
@@ -131,15 +176,20 @@
 
 	$: allCardsFlipped = selectedCards.length > 0 && flippedIds.size === selectedCards.length;
 
-	$: if (allCardsFlipped && hasDrawn && hasSelectedMode && !isLoading) {
+	$: if (allCardsFlipped && hasDrawn && hasSelectedMode) {
 		const lang = $language ?? 'sv';
+		const interpretationKey = getInterpretationKey(lang, mode);
 		const cachedInterpretation = interpretationCache[lang]?.[mode];
 
-		if (cachedInterpretation && interpretation !== cachedInterpretation) {
-			interpretation = cachedInterpretation;
-			startTyping(interpretation);
-		} else if (!cachedInterpretation && !isLoading) {
-			fetchInterpretation();
+		if (cachedInterpretation) {
+			if (loadedInterpretationKey !== interpretationKey || interpretation !== cachedInterpretation) {
+				showCachedInterpretation(cachedInterpretation, interpretationKey);
+			}
+		} else if (loadedInterpretationKey === interpretationKey) {
+			clearInterpretationState();
+			loadedInterpretationKey = '';
+		} else if (failedInterpretationKey !== interpretationKey && activeFetchKey !== interpretationKey) {
+			fetchInterpretation(interpretationKey, lang, mode);
 		}
 	}
 
@@ -171,48 +221,81 @@
 		hasSelectedMode = true;
 
 		const lang = $language ?? 'sv';
-		const cachedInterpretation = interpretationCache[lang]?.[mode];
+		const interpretationKey = getInterpretationKey(lang, selected);
+		const cachedInterpretation = interpretationCache[lang]?.[selected];
 
 		if (cachedInterpretation) {
-			interpretation = cachedInterpretation;
-			startTyping(interpretation);
+			showCachedInterpretation(cachedInterpretation, interpretationKey);
 			return;
 		}
 
-		fetchInterpretation();
+		if (loadedInterpretationKey !== interpretationKey) {
+			clearInterpretationState();
+		}
 	}
 
-	async function fetchInterpretation() {
+	async function fetchInterpretation(
+		interpretationKey = getInterpretationKey(),
+		lang: 'sv' | 'en' = $language ?? 'sv',
+		selectedMode: 'soft' | 'direct' = mode ?? 'soft'
+	) {
 		if (!question.trim() || selectedCards.length === 0) return;
 		if (!hasSelectedMode) return;
+		if (activeFetchKey === interpretationKey || failedInterpretationKey === interpretationKey) return;
 
 		try {
+			activeFetchKey = interpretationKey;
 			isLoading = true;
 			error = '';
-			interpretation = '';
+			if (loadedInterpretationKey !== interpretationKey) {
+				stopTyping();
+				interpretation = '';
+				displayedInterpretation = '';
+			}
 
 			const result = await interpretTarot({
 				question,
 				cards: selectedCards.map((c) => c.shortName),
-				language: $language ?? 'sv',
-				mode
+				language: lang,
+				mode: selectedMode
 			});
 
-			interpretation = result?.interpretation ?? '';
-			const lang = $language ?? 'sv';
-			if (!interpretationCache[lang]) interpretationCache[lang] = {};
-			interpretationCache[lang][mode] = interpretation;
-			startTyping(interpretation);
-			if (!interpretation) {
-				error = 'No interpretation returned';
+			if (activeFetchKey !== interpretationKey) {
+				return;
 			}
+
+			const nextInterpretation = result?.interpretation?.trim() ?? '';
+
+			if (!nextInterpretation) {
+				throw new Error('No interpretation returned');
+			}
+
+			if (!interpretationCache[lang]) interpretationCache[lang] = {};
+			interpretationCache[lang][selectedMode] = nextInterpretation;
+			interpretation = nextInterpretation;
+			loadedInterpretationKey = interpretationKey;
+			failedInterpretationKey = '';
+			startTyping(nextInterpretation);
 			setTimeout(() => {
 				document.querySelector('.prompt')?.scrollIntoView({ behavior: 'smooth' });
 			}, 50);
 		} catch (err) {
+			if (activeFetchKey !== interpretationKey) {
+				return;
+			}
+
+			stopTyping();
+			displayedInterpretation = '';
 			error = err instanceof Error ? err.message : 'Something went wrong';
+			interpretation = '';
+			loadedInterpretationKey = '';
+			failedInterpretationKey = interpretationKey;
+			return;
 		} finally {
-			isLoading = false;
+			if (activeFetchKey === interpretationKey) {
+				isLoading = false;
+				activeFetchKey = '';
+			}
 		}
 	}
 </script>
@@ -324,27 +407,27 @@
 						<Button 
 							on:click={() => selectMode('soft')}
 							disabled={isLoading}
-							class={mode === 'soft' ? 'active' : ''}>
+							variant={mode === 'soft' && hasSelectedMode ? 'primary' : 'ghost'}>
 							😇 {t.page.modeSoft}
 						</Button>
 
 						<Button 
 							on:click={() => selectMode('direct')}
 							disabled={isLoading}
-							class={mode === 'direct' ? 'active' : ''}>
+							variant={mode === 'direct' && hasSelectedMode ? 'primary' : 'ghost'}>
 							😈 {t.page.modeDirect}
 						</Button>
 					</div>
 				</div>
 
-				{#if isLoading && !interpretation}
+				{#if isLoading && !interpretation && !error}
 					<p class="loading">Läser av korten...</p>
 				{/if}
 
-				{#if interpretation}
+				{#if interpretation && !error}
 					<TarotInterpretation {interpretation} {displayedInterpretation} {mode} />
 				{:else if error}
-					<p class="error">{error}</p>
+					<TarotPrompt cards={selectedCards} {question} {mode} />
 				{/if}
 			</section>
 		{/if}

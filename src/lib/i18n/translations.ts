@@ -31,9 +31,11 @@ interpretationHeader: string;
 header: string;
 copy: string;
 copied: string;
-disclaimer: string;
-interpretationDisclaimerSoft: string;
-interpretationDisclaimerDirect: string;
+disclaimer: {
+  base: string;
+  soft: string;
+  direct: string;
+};
 
 title: string;
 questionIntro: string;
@@ -45,7 +47,14 @@ two: string;
 three: string;
 };
 
+directFrames: {
+  one: string;
+  two: string;
+  three: string;
+};
+
 tone: string;
+directTone: string;
 summary: string;
 };
 };
@@ -95,12 +104,11 @@ interpretationHeader: 'Din tolkning',
 header: 'Tarotprompt – redo att kopiera',
 copy: 'Kopiera',
 copied: 'Kopierad ✓',
-    disclaimer:
-    'Frågan och tolkningen skapas av dig. Verktyget hjälper endast till att formulera en strukturerad tarot-prompt för reflektion eller vidare tolkning.',
-    interpretationDisclaimerSoft:
-    'En reflekterande tolkning baserad på korten. Ta till dig det som känns relevant och låt resten passera.',
-    interpretationDisclaimerDirect:
-    'Denna tolkning ger en tydlig riktning baserad på korten. Den är inte absolut sanning, men den undviker inte att ge ett konkret svar.',
+    disclaimer: {
+      base: 'Frågan och tolkningen skapas av dig. Verktyget hjälper endast till att formulera en strukturerad tarot-prompt för reflektion eller vidare tolkning.',
+      soft: 'En reflekterande tolkning baserad på korten. Ta till dig det som känns relevant och låt resten passera.',
+      direct: 'Denna tolkning ger en tydlig riktning baserad på korten. Den är inte absolut sanning, men den undviker inte att ge ett konkret svar.'
+    },
 
 title: 'Tarotläggning – tolkning önskas',
 questionIntro: 'Jag har ställt följande fråga:',
@@ -117,8 +125,19 @@ three: `Tolka tarotläggningen som en helhet, inte enbart kort för kort.
 Fokusera på det övergripande temat, hur korten samspelar och vilken vägledning som är relevant för frågan.`
 },
 
+directFrames: {
+  one: `Ge ett rakt budskap kopplat till frågan. Undvik tolkningar som blir för öppna – vad pekar detta tydligt på?`,
+
+  two: `Tolka korten som en spänning eller konflikt. Vad blockerar och vad driver framåt? Var konkret.`,
+
+  three: `Se helheten och peka ut en tydlig riktning. Vad behöver göras nu, trots tvekan eller motstånd?`
+},
+
 tone:
 'Tolkningen ska vara reflekterande, jordnära och stödjande – inte förutsägande eller absolut.',
+
+directTone:
+'Var tydlig, konkret och något utmanande. Undvik fluff och vaga formuleringar.',
 
 summary:
 'Avsluta med en kort sammanfattning av kärnbudskapet.'
@@ -170,12 +189,11 @@ interpretationHeader: 'Your interpretation',
 header: 'Tarot prompt – ready to copy',
 copy: 'Copy',
 copied: 'Copied ✓',
-    disclaimer:
-    'The question and interpretation are created by you. The tool only helps structure a tarot prompt for reflection or further interpretation.',
-    interpretationDisclaimerSoft:
-    'This interpretation is meant for reflection. Take what resonates and leave the rest.',
-    interpretationDisclaimerDirect:
-    'This interpretation offers a clear direction based on the cards. It is not absolute truth, but it does not avoid giving a concrete answer.',
+    disclaimer: {
+      base: 'The question and interpretation are created by you. The tool only helps structure a tarot prompt for reflection or further interpretation.',
+      soft: 'This interpretation is meant for reflection. Take what resonates and leave the rest.',
+      direct: 'This interpretation offers a clear direction based on the cards. It is not absolute truth, but it does not avoid giving a concrete answer.'
+    },
 
 title: 'Tarot reading – interpretation requested',
 
@@ -195,8 +213,19 @@ three: `Interpret the tarot reading as a whole, not just card by card.
 Focus on the overall theme, how the cards interact and what guidance is relevant to the question.`
 },
 
+directFrames: {
+  one: `Give a clear and direct message connected to the question. Avoid overly open interpretation — what does this clearly point to?`,
+
+  two: `Interpret the cards as tension or conflict. What is blocking you and what pushes forward? Be concrete.`,
+
+  three: `Look at the whole and point to a clear direction. What needs to be done now, despite hesitation or resistance?`
+},
+
 tone:
 'The interpretation should be reflective, grounded and supportive — not predictive or absolute.',
+
+directTone:
+'Be clear, concrete and slightly challenging. Avoid fluff and vague language.',
 
 summary:
 'End with a short summary of the core message.'
