@@ -10,8 +10,10 @@
 	import { language } from '$lib/stores/language';
 	import { translations } from '$lib/i18n/translations';
 	import { interpretTarot } from '$lib/api/tarot';
+	import { onMount } from 'svelte';
 
 	const guideImage = 'intro/the_veil.png';
+	const cardBackImage = 'tarot/back/TarotKort_Baksida.png';
 
 	let t;
 
@@ -36,15 +38,22 @@
 	let previousCardCount: 1 | 2 | 3 = cardCount;
 	// Used to detect spread size changes
 
-	let interpretation: string = '';
-	let isLoading = false;
-	let error: string = '';
-	let hasFetched = false;
+let interpretation: string = '';
+let isLoading = false;
+let error: string = '';
+let hasFetched = false;
 
-	let displayedInterpretation: string = '';
-	let typingInterval: ReturnType<typeof setInterval> | null = null;
+let displayedInterpretation: string = '';
+let typingInterval: ReturnType<typeof setInterval> | null = null;
 
-	let interpretationCache: Record<string, string> = {};
+let interpretationCache: Record<string, string> = {};
+
+let mode: 'soft' | 'direct' = 'soft';
+
+onMount(() => {
+  const img = new Image();
+  img.src = `${base}/${cardBackImage}`;
+});
 
 	function startTyping(text: string) {
 		if (typingInterval) {
@@ -300,7 +309,7 @@
 				{#if isLoading}
 					<p>Läser av korten...</p>
 				{:else if interpretation}
-					<TarotInterpretation {interpretation} {displayedInterpretation} />
+					<TarotInterpretation {interpretation} {displayedInterpretation} {mode} />
 				{:else}
 					<!-- fallback -->
 					<TarotPrompt {question} cards={selectedCards} />
