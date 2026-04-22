@@ -61,9 +61,21 @@
 	onMount(() => {
 		const img = new Image();
 		img.src = `${base}/${cardBackImage}`;
+
+		// preloada hela kortleken i bakgrunden (lugnt)
+		setTimeout(() => {
+			preloadDeckImages();
+		}, 1000);
 	});
 
 	const DEAL_DELAY_MS = 160;
+
+	function preloadDeckImages() {
+		tarotDeck.forEach((card) => {
+			const img = new Image();
+			img.src = `${base}/tarot/cards/${card.image}`;
+		});
+	}
 
 	function wait(ms: number) {
 		return new Promise((resolve) => setTimeout(resolve, ms));
@@ -710,7 +722,6 @@
 		accent-color: var(--accent-light);
 		cursor: pointer;
 	}
-
 
 	.controls {
 		display: flex;
