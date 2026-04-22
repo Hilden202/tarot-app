@@ -33,6 +33,7 @@
 	let isDealing = false;
 	let isReady = false;
 	let dealtIds = new Set<string>();
+	let imageReadyIds = new Set<string>();
 
 	let selectedSuggestionIndex: number | null = null;
 	// Tracks whether the current question was auto-filled from suggestions
@@ -73,22 +74,43 @@
 				(card) =>
 					new Promise<void>((resolve) => {
 						const img = new Image();
+						let isSettled = false;
 
-						img.onload = async () => {
+						const finalize = async () => {
+							if (isSettled) return;
+							isSettled = true;
+
 							try {
 								await img.decode();
 							} catch {}
 							resolve();
 						};
-						img.onerror = () => resolve();
+
+						img.onload = () => {
+							void finalize();
+						};
+						img.onerror = () => {
+							if (isSettled) return;
+							isSettled = true;
+							resolve();
+						};
 						img.src = `${base}/tarot/cards/${card.image}`;
 
 						if (img.complete) {
-							resolve();
+							void finalize();
 						}
 					})
 			)
 		);
+	}
+
+	function updateReadyState() {
+		const totalCards = selectedCards.length;
+		isReady = totalCards > 0 && dealtIds.size === totalCards && imageReadyIds.size === totalCards;
+
+		if (isReady) {
+			isDealing = false;
+		}
 	}
 
 	function startTyping(text: string) {
@@ -180,6 +202,7 @@
 		isDealing = false;
 		isReady = false;
 		dealtIds = new Set<string>();
+		imageReadyIds = new Set<string>();
 		hasSelectedMode = false;
 		interpretation = '';
 		error = '';
@@ -241,6 +264,7 @@
 		isDealing = true;
 		drawId++;
 		dealtIds = new Set<string>();
+		imageReadyIds = new Set<string>();
 		isReady = false;
 
 		// skapa nytt kort
@@ -274,12 +298,16 @@
 		const next = new Set(dealtIds);
 		next.add(id);
 		dealtIds = next;
+		updateReadyState();
+	}
 
-		// När ALLA kort rapporterat klart
-		if (dealtIds.size === selectedCards.length && selectedCards.length > 0) {
-			isReady = true;
-			isDealing = false;
-		}
+	function handleCardImageReady(event: CustomEvent<{ id: string }>) {
+		const id = event.detail.id;
+
+		const next = new Set(imageReadyIds);
+		next.add(id);
+		imageReadyIds = next;
+		updateReadyState();
 	}
 
 	function selectMode(selected: 'soft' | 'direct') {
@@ -397,6 +425,7 @@
 						isInteractive={isReady}
 						onFlipChange={handleFlipChange}
 						on:dealt={handleCardDealt}
+						on:imageready={handleCardImageReady}
 					/>
 				{/each}
 			{/if}

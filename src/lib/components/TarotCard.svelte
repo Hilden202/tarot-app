@@ -1,20 +1,25 @@
 ﻿<script lang="ts">
 	import type { TarotCardData } from '$lib/data/tarotDeck';
 	import { base } from '$app/paths';
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onMount, tick } from 'svelte';
 
 	export let card: TarotCardData;
 	export let isInteractive = true;
 
 	export let onFlipChange: (payload: { id: string; isFlipped: boolean }) => void = () => {};
 
-	const dispatch = createEventDispatcher();
+	const dispatch = createEventDispatcher<{
+		dealt: { id: string };
+		imageready: { id: string };
+	}>();
 
 	let isFlipped = false;
+	let frontImageEl: HTMLImageElement | null = null;
+	let isImageReady = false;
 
 	const backImage = 'back/TarotKort_Baksida.png';
 	function flipCard() {
-		if (!isInteractive) return;
+		if (!isInteractive || !isImageReady) return;
 
 		isFlipped = !isFlipped;
 
@@ -28,12 +33,31 @@
 		// notify parent that this card finished its deal animation
 		dispatch('dealt', { id: card.id });
 	}
+
+	async function markImageReady() {
+		if (isImageReady || !frontImageEl || !frontImageEl.complete) return;
+
+		try {
+			await frontImageEl.decode();
+		} catch {
+			// Some browsers may reject decode() for already decoded images.
+		}
+
+		isImageReady = true;
+		dispatch('imageready', { id: card.id });
+	}
+
+	onMount(async () => {
+		await tick();
+		void markImageReady();
+	});
 </script>
 
 <button
 	class="card"
 	class:flipped={isFlipped}
 	class:nonInteractive={!isInteractive}
+	class:imageReady={isImageReady}
 	on:click={flipCard}
 	on:animationend={handleAnimationEnd}
 >
@@ -45,11 +69,17 @@
 	<!-- Framsida -->
 	<div class="frontCard">
 		<img
+			bind:this={frontImageEl}
 			src={`${base}/tarot/cards/${card.image}`}
 			alt={card.fullTitle}
 			loading="eager"
-			decoding="async"
+			decoding="sync"
+			on:load={markImageReady}
 		/>
+	</div>
+
+	<div class="prewarmLayer" aria-hidden="true">
+		<img src={`${base}/tarot/cards/${card.image}`} alt="" loading="eager" decoding="sync" />
 	</div>
 </button>
 
@@ -71,6 +101,10 @@
 		cursor: default;
 		opacity: 0.85;
 		transform: scale(0.96);
+	}
+
+	.card:not(.imageReady) {
+		cursor: default;
 	}
 
 	@media (max-width: 600px) {
@@ -112,6 +146,20 @@
 
 	.backCard img,
 	.frontCard img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.prewarmLayer {
+		position: absolute;
+		inset: 0;
+		opacity: 0;
+		pointer-events: none;
+		z-index: -1;
+	}
+
+	.prewarmLayer img {
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
