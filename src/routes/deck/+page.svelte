@@ -1,9 +1,17 @@
 <script lang="ts">
 	import { tarotDeck } from '$lib/data/tarotDeck';
 	import { base } from '$app/paths';
+	import { goto } from '$app/navigation';
 </script>
 
+<button class="back-button" on:click={() => history.back()}>
+	← Tillbaka
+</button>
+
 <h1>Kortlek</h1>
+<p class="wip-note">
+	Denna sida är under utveckling. Vissa funktioner och översättningar saknas.
+</p>
 
 <p>Antal kort: {tarotDeck.length}</p>
 
@@ -28,6 +36,27 @@
 {/each}
 
 <style>
+	.back-button {
+		background: transparent;
+		border: none;
+		color: inherit;
+		font-size: 0.9rem;
+		opacity: 0.7;
+		cursor: pointer;
+		margin-bottom: 0.5rem;
+		transition: opacity 0.2s ease;
+	}
+
+	.back-button:hover {
+		opacity: 1;
+	}
+
+	.wip-note {
+		font-size: 0.9rem;
+		opacity: 0.7;
+		margin-bottom: 1rem;
+		text-align: center;
+	}
 	.section-title {
 		margin-top: 2rem;
 		margin-bottom: 0.5rem;
