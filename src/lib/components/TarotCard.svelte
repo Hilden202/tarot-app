@@ -115,23 +115,23 @@
 	}
 
 	.card {
-		transform: scale(0.96);
+		animation: dealIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 	}
 
-	.card:not(.nonInteractive) {
-		transform: scale(1);
-		animation: readyPulse 0.3s ease;
-	}
-
-	@keyframes readyPulse {
+	@keyframes dealIn {
 		0% {
-			transform: scale(0.96);
+			opacity: 0;
+			transform: translateY(30px) scale(0.92);
 		}
-		50% {
-			transform: scale(1.02);
+		60% {
+			opacity: 1;
+			transform: translateY(-6px) scale(1.04);
+		}
+		80% {
+			transform: translateY(2px) scale(0.98);
 		}
 		100% {
-			transform: scale(1);
+			transform: translateY(0) scale(1);
 		}
 	}
 </style>
