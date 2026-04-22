@@ -3,6 +3,7 @@
 	import { base } from '$app/paths';
 
 	export let card: TarotCardData;
+	export let isInteractive = true;
 
 	export let onFlipChange: (payload: { id: string; isFlipped: boolean }) => void = () => {};
 
@@ -10,6 +11,8 @@
 
 	const backImage = 'back/TarotKort_Baksida.png';
 	function flipCard() {
+		if (!isInteractive) return;
+
 		isFlipped = !isFlipped;
 
 		onFlipChange({
@@ -19,7 +22,12 @@
 	}
 </script>
 
-<button class="card" class:flipped={isFlipped} on:click={flipCard}>
+<button
+	class="card"
+	class:flipped={isFlipped}
+	class:nonInteractive={!isInteractive}
+	on:click={flipCard}
+>
 	<!-- Baksida -->
 	<div class="backCard">
 		<img src={`${base}/tarot/${backImage}`} alt="Tarotkort – baksida" />
@@ -43,6 +51,12 @@
 		cursor: pointer;
 		filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.35))
 			drop-shadow(0 30px 60px rgba(0, 0, 0, 0.25));
+	}
+
+	.card.nonInteractive {
+		cursor: default;
+		opacity: 0.85;
+		transform: scale(0.96);
 	}
 
 	@media (max-width: 600px) {
@@ -87,5 +101,37 @@
 		width: 100%;
 		height: 100%;
 		object-fit: cover;
+	}
+
+	.card {
+		transition:
+			transform 0.25s ease,
+			filter 0.25s ease;
+	}
+
+	.card:active {
+		transform: scale(0.98);
+		filter: brightness(0.95);
+	}
+
+	.card {
+		transform: scale(0.96);
+	}
+
+	.card:not(.nonInteractive) {
+		transform: scale(1);
+		animation: readyPulse 0.3s ease;
+	}
+
+	@keyframes readyPulse {
+		0% {
+			transform: scale(0.96);
+		}
+		50% {
+			transform: scale(1.02);
+		}
+		100% {
+			transform: scale(1);
+		}
 	}
 </style>

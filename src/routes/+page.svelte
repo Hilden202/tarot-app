@@ -30,6 +30,7 @@
 	// restrict to valid spread sizes
 
 	let hasDrawn = false;
+	let isDealing = false;
 
 	let selectedSuggestionIndex: number | null = null;
 	// Tracks whether the current question was auto-filled from suggestions
@@ -51,12 +52,37 @@
 	let loadedInterpretationKey = '';
 	let failedInterpretationKey = '';
 
-let mode: 'soft' | 'direct' | null = null;
+	let mode: 'soft' | 'direct' | null = null;
 
 	onMount(() => {
 		const img = new Image();
 		img.src = `${base}/${cardBackImage}`;
 	});
+
+	const DEAL_DELAY_MS = 160;
+
+	function wait(ms: number) {
+		return new Promise((resolve) => setTimeout(resolve, ms));
+	}
+
+	async function preloadCards(cards: TarotCardData[]): Promise<void> {
+		await Promise.all(
+			cards.map(
+				(card) =>
+					new Promise<void>((resolve) => {
+						const img = new Image();
+
+						img.onload = () => resolve();
+						img.onerror = () => resolve();
+						img.src = `${base}/tarot/cards/${card.image}`;
+
+						if (img.complete) {
+							resolve();
+						}
+					})
+			)
+		);
+	}
 
 	function startTyping(text: string) {
 		if (typingInterval) {
@@ -136,13 +162,6 @@ let mode: 'soft' | 'direct' | null = null;
 
 	// Removed reactive block for allCardsFlipped && !isLoading && hasDrawn && hasFetched
 
-	$: if (selectedCards.length > 0) {
-		selectedCards.forEach((card) => {
-			const img = new Image();
-			img.src = `${base}/tarot/cards/${card.image}`;
-		});
-	}
-
 	function resetDraw() {
 		stopTyping();
 		selectedCards = [];
@@ -151,6 +170,7 @@ let mode: 'soft' | 'direct' | null = null;
 		selectedSuggestionIndex = null;
 		scrollQuestionIndex = 0;
 		hasDrawn = false;
+		isDealing = false;
 		hasSelectedMode = false;
 		interpretation = '';
 		error = '';
@@ -163,6 +183,8 @@ let mode: 'soft' | 'direct' | null = null;
 	}
 
 	function handleFlipChange(payload: { id: string; isFlipped: boolean }) {
+		if (isDealing) return;
+
 		const next = new Set(flippedIds);
 
 		if (payload.isFlipped) {
@@ -178,8 +200,9 @@ let mode: 'soft' | 'direct' | null = null;
 
 	$: if (allCardsFlipped && hasDrawn && hasSelectedMode) {
 		const lang = $language ?? 'sv';
-		const interpretationKey = getInterpretationKey(lang, mode);
-		const cachedInterpretation = interpretationCache[lang]?.[mode];
+		const selectedMode = mode ?? undefined;
+		const interpretationKey = getInterpretationKey(lang, selectedMode);
+		const cachedInterpretation = mode ? interpretationCache[lang]?.[mode] : undefined;
 
 		if (cachedInterpretation) {
 			if (loadedInterpretationKey !== interpretationKey || interpretation !== cachedInterpretation) {
@@ -189,13 +212,18 @@ let mode: 'soft' | 'direct' | null = null;
 			clearInterpretationState();
 			loadedInterpretationKey = '';
 		} else if (failedInterpretationKey !== interpretationKey && activeFetchKey !== interpretationKey) {
-			fetchInterpretation(interpretationKey, lang, mode);
+			fetchInterpretation(interpretationKey, lang, selectedMode);
 		}
 	}
 
-	function newCards() {
+	async function newCards() {
+		if (isDealing) return;
+
 		// reset
+		selectedCards = [];
 		flippedIds = new Set<string>();
+		hasDrawn = false;
+		isDealing = true;
 		drawId++;
 
 		// skapa nytt kort
@@ -211,9 +239,15 @@ let mode: 'soft' | 'direct' | null = null;
 			// lägg i selectedCards
 			returnSelected.push(card);
 		}
-		// ersätt
-		selectedCards = returnSelected;
+		await preloadCards(returnSelected);
+
+		for (const card of returnSelected) {
+			selectedCards = [...selectedCards, card];
+			await wait(DEAL_DELAY_MS);
+		}
+
 		hasDrawn = true;
+		isDealing = false;
 	}
 
 	function selectMode(selected: 'soft' | 'direct') {
@@ -317,15 +351,15 @@ let mode: 'soft' | 'direct' | null = null;
 		</header>
 
 		<section class="cards">
-			{#if !hasDrawn}
+			{#if !hasDrawn && !isDealing}
 				<div class="veil-slot">
 					<div class="theVeil">
 						<img src={`${base}/tarot/${guideImage}`} alt="Tarotkort – vägledning" />
 					</div>
 				</div>
-			{:else}
+			{:else if selectedCards.length > 0}
 				{#each selectedCards as card (`${drawId}-${card.id}`)}
-					<TarotCard {card} onFlipChange={handleFlipChange} />
+					<TarotCard {card} isInteractive={!isDealing} onFlipChange={handleFlipChange} />
 				{/each}
 			{/if}
 		</section>
@@ -333,20 +367,20 @@ let mode: 'soft' | 'direct' | null = null;
 		<section class="controls">
 			<div class="control-inner">
 				<div class="question">
-					{#if !hasDrawn}
+					{#if !hasDrawn && !isDealing}
 						<div class="card-count">
 							<label>
-								<input type="radio" bind:group={cardCount} value={1} />
+								<input type="radio" bind:group={cardCount} value={1} disabled={isDealing} />
 								{t.page.cardCountLabel(1)}
 							</label>
 
 							<label>
-								<input type="radio" bind:group={cardCount} value={2} />
+								<input type="radio" bind:group={cardCount} value={2} disabled={isDealing} />
 								{t.page.cardCountLabel(2)}
 							</label>
 
 							<label>
-								<input type="radio" bind:group={cardCount} value={3} />
+								<input type="radio" bind:group={cardCount} value={3} disabled={isDealing} />
 								{t.page.cardCountLabel(3)}
 							</label>
 						</div>
@@ -360,10 +394,10 @@ let mode: 'soft' | 'direct' | null = null;
 								selectedSuggestionIndex = null;
 							}}
 							placeholder={t.page.questionPlaceholder}
-							disabled={hasDrawn}
+							disabled={hasDrawn || isDealing}
 						></textarea>
 					</label>
-					{#if !hasDrawn}
+					{#if !hasDrawn && !isDealing}
 						<div class="suggestions">
 							<TarotScroll
 								questions={visibleQuestions}
@@ -388,7 +422,7 @@ let mode: 'soft' | 'direct' | null = null;
 					{/if}
 				</div>
 				{#if !hasDrawn}
-					<Button on:click={newCards} disabled={!question.trim()}>
+					<Button on:click={newCards} disabled={!question.trim() || isDealing}>
 						{t.page.drawButton(cardCount)}
 					</Button>
 				{:else}
@@ -425,9 +459,13 @@ let mode: 'soft' | 'direct' | null = null;
 				{/if}
 
 				{#if interpretation && !error}
-					<TarotInterpretation {interpretation} {displayedInterpretation} {mode} />
+					<TarotInterpretation
+						{interpretation}
+						{displayedInterpretation}
+						mode={mode ?? undefined}
+					/>
 				{:else if error}
-					<TarotPrompt cards={selectedCards} {question} {mode} />
+					<TarotPrompt cards={selectedCards} {question} mode={mode ?? undefined} />
 				{/if}
 			</section>
 		{/if}
