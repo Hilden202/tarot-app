@@ -428,6 +428,7 @@
 					<TarotCard
 						{card}
 						isInteractive={isReady}
+						{isReady}
 						onFlipChange={handleFlipChange}
 						on:dealt={handleCardDealt}
 						on:imageready={handleCardImageReady}
@@ -701,6 +702,24 @@
 	.card-count input[type='radio'] {
 		accent-color: var(--accent-light);
 		cursor: pointer;
+	}
+
+	.card.ready {
+		box-shadow:
+			0 0 20px rgba(200, 180, 255, 0.5),
+			0 0 40px rgba(140, 120, 255, 0.4);
+	}
+
+	@keyframes readyPulse {
+		0% {
+			transform: scale(1);
+		}
+		50% {
+			transform: scale(1.02);
+		}
+		100% {
+			transform: scale(1);
+		}
 	}
 
 	.controls {

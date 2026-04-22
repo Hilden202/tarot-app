@@ -7,6 +7,7 @@
 	export let isInteractive = true;
 
 	export let onFlipChange: (payload: { id: string; isFlipped: boolean }) => void = () => {};
+	export let isReady = false;
 
 	const dispatch = createEventDispatcher<{
 		dealt: { id: string };
@@ -58,6 +59,7 @@
 	class:flipped={isFlipped}
 	class:nonInteractive={!isInteractive}
 	class:imageReady={isImageReady}
+	class:ready={isReady}
 	on:click={flipCard}
 	on:animationend={handleAnimationEnd}
 >
