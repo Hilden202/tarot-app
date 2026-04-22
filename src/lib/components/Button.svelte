@@ -1,5 +1,5 @@
 ﻿<script lang="ts">
-	export let variant: 'primary' | 'ghost' = 'primary';
+	export let variant: 'primary' | 'ghost' | 'secondary' | 'subtle' = 'primary';
 	export let disabled = false;
 	export let type: 'button' | 'submit' = 'button';
 </script>
@@ -49,5 +49,35 @@
 	.btn.ghost:hover:not(:disabled) {
 		transform: translateY(-1px);
 		box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+	}
+
+	/* SECONDARY */
+	.btn.secondary {
+		background: var(--secondary-color);
+		color: var(--secondary-text-color);
+		border: 1px solid var(--muted-color);
+	}
+
+	.btn.secondary:hover:not(:disabled) {
+		background: var(--secondary-hover-color);
+	}
+
+	/* SUBTLE */
+	.btn.subtle {
+		background: transparent;
+		color: var(--muted-color);
+		border: none;
+		box-shadow: none;
+	}
+
+	.btn.subtle:hover:not(:disabled) {
+		opacity: 0.85;
+		letter-spacing: 0.02em;
+		color: var(--text-color);
+		transform: translateY(-1px);
+	}
+
+	.btn:active:not(:disabled) {
+		transform: scale(0.97);
 	}
 </style>

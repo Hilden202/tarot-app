@@ -11,6 +11,7 @@
 	import { interpretTarot } from '$lib/api/tarot';
 	import { onMount } from 'svelte';
 	import TarotPrompt from '$lib/components/TarotPrompt.svelte';
+	import { goto } from '$app/navigation';
 
 	const guideImage = 'intro/the_veil.png';
 	const cardBackImage = 'tarot/back/TarotKort_Baksida.png';
@@ -503,6 +504,12 @@
 						{t.page.resetButton}
 					</Button>
 				{/if}
+
+				<div class="secondary-actions">
+					<Button variant="subtle" on:click={() => goto('/deck')}>
+						{t.page.deckButton}
+					</Button>
+				</div>
 			</div>
 		</section>
 		{#if allCardsFlipped}
@@ -704,23 +711,6 @@
 		cursor: pointer;
 	}
 
-	.card.ready {
-		box-shadow:
-			0 0 20px rgba(200, 180, 255, 0.5),
-			0 0 40px rgba(140, 120, 255, 0.4);
-	}
-
-	@keyframes readyPulse {
-		0% {
-			transform: scale(1);
-		}
-		50% {
-			transform: scale(1.02);
-		}
-		100% {
-			transform: scale(1);
-		}
-	}
 
 	.controls {
 		display: flex;
@@ -738,7 +728,16 @@
 	.controls button {
 		width: 100%;
 		max-width: 420px;
-		margin-top: 0.5rem;
+	}
+
+	.secondary-actions {
+		display: flex;
+		justify-content: center;
+		margin-top: -0.1rem;
+	}
+
+	.secondary-actions :global(button) {
+		max-width: 220px;
 	}
 
 	.question {

@@ -1,234 +1,236 @@
 export type Lang = 'sv' | 'en';
 
 type TranslationSchema = {
-page: {
-title: string;
-intro: string;
-questionLabel: string;
-questionPlaceholder: string;
-drawButton: (count: number) => string;
-resetButton: string;
-cardCountLabel: (count: number) => string;
-progress: (flipped: number, total: number) => string;
-modeLabel: string;
-modeSoft: string;
-modeDirect: string;
-};
+  page: {
+    title: string;
+    intro: string;
+    questionLabel: string;
+    questionPlaceholder: string;
+    drawButton: (count: number) => string;
+    resetButton: string;
+    cardCountLabel: (count: number) => string;
+    progress: (flipped: number, total: number) => string;
+    modeLabel: string;
+    modeSoft: string;
+    modeDirect: string;
+    deckButton: string;
+  };
 
-questions: {
-        1: string[];
-        2: string[];
-        3: string[];
-};
+  questions: {
+    1: string[];
+    2: string[];
+    3: string[];
+  };
 
-scroll: {
-  title: string;
-  hint: string;
-};
+  scroll: {
+    title: string;
+    hint: string;
+  };
 
-prompt: {
-interpretationHeader: string;
-header: string;
-copy: string;
-copied: string;
-disclaimer: {
-  base: string;
-  soft: string;
-  direct: string;
-};
+  prompt: {
+    interpretationHeader: string;
+    header: string;
+    copy: string;
+    copied: string;
+    disclaimer: {
+      base: string;
+      soft: string;
+      direct: string;
+    };
 
-title: string;
-questionIntro: string;
-cardsIntro: (count: number) => string;
+    title: string;
+    questionIntro: string;
+    cardsIntro: (count: number) => string;
 
-frames: {
-one: string;
-two: string;
-three: string;
-};
+    frames: {
+      one: string;
+      two: string;
+      three: string;
+    };
 
-directFrames: {
-  one: string;
-  two: string;
-  three: string;
-};
+    directFrames: {
+      one: string;
+      two: string;
+      three: string;
+    };
 
-tone: string;
-directTone: string;
-summary: string;
-};
+    tone: string;
+    directTone: string;
+    summary: string;
+  };
 };
 
 export const translations: Record<Lang, TranslationSchema> = {
-sv: {
-page: {
-title: 'Tarotläggning',
-intro: 'Ställ en fråga, dra dina kort och få en reflekterande tolkning direkt. Ingen spådom – bara ett nytt perspektiv.',
-questionLabel: 'Din fråga:',
-questionPlaceholder: 'Vad vill du få vägledning kring just nu?',
-drawButton: (count: number) => `Dra ${count} kort`,
-resetButton: 'Ny dragning',
+  sv: {
+    page: {
+      title: 'Tarotläggning',
+      intro: 'Ställ en fråga, dra dina kort och få en reflekterande tolkning direkt. Ingen spådom – bara ett nytt perspektiv.',
+      questionLabel: 'Din fråga:',
+      questionPlaceholder: 'Vad vill du få vägledning kring just nu?',
+      drawButton: (count: number) => `Dra ${count} kort`,
+      resetButton: 'Ny dragning',
 
-cardCountLabel: (count: number) =>
-count === 1 ? '1 kort' : `${count} kort`,
+      cardCountLabel: (count: number) =>
+        count === 1 ? '1 kort' : `${count} kort`,
 
-progress: (flipped: number, total: number) =>
-`${flipped} / ${total} kort uppvända`,
-modeLabel: 'Hur vill du höra detta?',
-modeSoft: 'Mjukt',
-modeDirect: 'Rakt'
-},
-questions: {
-  1: [
-    'Vad är kärnan i situationen just nu?',
-    'Vad behöver jag förstå djupare?',
-    'Vilken energi präglar detta ögonblick?'
-  ],
-  2: [
-    'Vad stöttar mig och vad håller mig tillbaka?',
-    'Vad är inre påverkan och vad är yttre påverkan?',
-    'Vad vill jag och vad behöver jag?'
-  ],
-  3: [
-    'Dåtid – Nutid – Framtid',
-    'Situation – Utmaning – Vägledning',
-    'Vad är synligt – Vad är dolt – Vad håller på att ta form'
-  ]
-},
-scroll: {
-  title: 'En fråga att utforska',
-  hint: 'Svep eller bläddra, tryck för att välja'
-},
-prompt: {
-interpretationHeader: 'Din tolkning',
-header: 'Tarotprompt – redo att kopiera',
-copy: 'Kopiera',
-copied: 'Kopierad ✓',
-    disclaimer: {
-      base: 'Frågan och tolkningen skapas av dig. Verktyget hjälper endast till att formulera en strukturerad tarot-prompt för reflektion eller vidare tolkning.',
-      soft: 'En reflekterande tolkning baserad på korten. Ta till dig det som känns relevant och låt resten passera.',
-      direct: 'Denna tolkning ger en tydlig riktning baserad på korten. Den är inte absolut sanning, men den undviker inte att ge ett konkret svar.'
+      progress: (flipped: number, total: number) =>
+        `${flipped} / ${total} kort uppvända`,
+      modeLabel: 'Hur vill du höra detta?',
+      modeSoft: 'Mjukt',
+      modeDirect: 'Rakt',
+      deckButton: 'Kortlek'
     },
+    questions: {
+      1: [
+        'Vad är kärnan i situationen just nu?',
+        'Vad behöver jag förstå djupare?',
+        'Vilken energi präglar detta ögonblick?'
+      ],
+      2: [
+        'Vad stöttar mig och vad håller mig tillbaka?',
+        'Vad är inre påverkan och vad är yttre påverkan?',
+        'Vad vill jag och vad behöver jag?'
+      ],
+      3: [
+        'Dåtid – Nutid – Framtid',
+        'Situation – Utmaning – Vägledning',
+        'Vad är synligt – Vad är dolt – Vad håller på att ta form'
+      ]
+    },
+    scroll: {
+      title: 'En fråga att utforska',
+      hint: 'Svep eller bläddra, tryck för att välja'
+    },
+    prompt: {
+      interpretationHeader: 'Din tolkning',
+      header: 'Tarotprompt – redo att kopiera',
+      copy: 'Kopiera',
+      copied: 'Kopierad ✓',
+      disclaimer: {
+        base: 'Frågan och tolkningen skapas av dig. Verktyget hjälper endast till att formulera en strukturerad tarot-prompt för reflektion eller vidare tolkning.',
+        soft: 'En reflekterande tolkning baserad på korten. Ta till dig det som känns relevant och låt resten passera.',
+        direct: 'Denna tolkning ger en tydlig riktning baserad på korten. Den är inte absolut sanning, men den undviker inte att ge ett konkret svar.'
+      },
 
-title: 'Tarotläggning – tolkning önskas',
-questionIntro: 'Jag har ställt följande fråga:',
-cardsIntro: (count: number) => `Jag drog ${count} tarotkort:`,
+      title: 'Tarotläggning – tolkning önskas',
+      questionIntro: 'Jag har ställt följande fråga:',
+      cardsIntro: (count: number) => `Jag drog ${count} tarotkort:`,
 
-frames: {
-one: `Tolka detta kort som ett övergripande budskap kopplat till frågan.
+      frames: {
+        one: `Tolka detta kort som ett övergripande budskap kopplat till frågan.
 Fokusera på insikt, riktning och medvetenhet snarare än detaljer eller förutsägelser.`,
 
-two: `Tolka korten som två perspektiv som belyser frågan från olika håll.
+        two: `Tolka korten som två perspektiv som belyser frågan från olika håll.
 Fokusera på hur de samspelar, kontrasterar eller kompletterar varandra.`,
 
-three: `Tolka tarotläggningen som en helhet, inte enbart kort för kort.
+        three: `Tolka tarotläggningen som en helhet, inte enbart kort för kort.
 Fokusera på det övergripande temat, hur korten samspelar och vilken vägledning som är relevant för frågan.`
-},
+      },
 
-directFrames: {
-  one: `Ge ett rakt budskap kopplat till frågan. Undvik tolkningar som blir för öppna – vad pekar detta tydligt på?`,
+      directFrames: {
+        one: `Ge ett rakt budskap kopplat till frågan. Undvik tolkningar som blir för öppna – vad pekar detta tydligt på?`,
 
-  two: `Tolka korten som en spänning eller konflikt. Vad blockerar och vad driver framåt? Var konkret.`,
+        two: `Tolka korten som en spänning eller konflikt. Vad blockerar och vad driver framåt? Var konkret.`,
 
-  three: `Se helheten och peka ut en tydlig riktning. Vad behöver göras nu, trots tvekan eller motstånd?`
-},
+        three: `Se helheten och peka ut en tydlig riktning. Vad behöver göras nu, trots tvekan eller motstånd?`
+      },
 
-tone:
-'Tolkningen ska vara reflekterande, jordnära och stödjande – inte förutsägande eller absolut.',
+      tone:
+        'Tolkningen ska vara reflekterande, jordnära och stödjande – inte förutsägande eller absolut.',
 
-directTone:
-'Var tydlig, konkret och något utmanande. Undvik fluff och vaga formuleringar.',
+      directTone:
+        'Var tydlig, konkret och något utmanande. Undvik fluff och vaga formuleringar.',
 
-summary:
-'Avsluta med en kort sammanfattning av kärnbudskapet.'
-}
+      summary:
+        'Avsluta med en kort sammanfattning av kärnbudskapet.'
+    }
+  },
 
-},
+  en: {
+    page: {
+      title: 'Tarot Reading',
+      intro: 'Ask a question, draw your cards and get a reflective interpretation instantly. No predictions — just a new perspective.',
+      questionLabel: 'Your question:',
+      questionPlaceholder: 'What would you like guidance on right now?',
+      drawButton: (count: number) => `Draw ${count} cards`,
+      resetButton: 'New reading',
 
-en: {
-page: {
-title: 'Tarot Reading',
-intro: 'Ask a question, draw your cards and get a reflective interpretation instantly. No predictions — just a new perspective.',
-questionLabel: 'Your question:',
-questionPlaceholder: 'What would you like guidance on right now?',
-drawButton: (count: number) => `Draw ${count} cards`,
-resetButton: 'New reading',
+      cardCountLabel: (count: number) =>
+        count === 1 ? '1 card' : `${count} cards`,
 
-cardCountLabel: (count: number) =>
-count === 1 ? '1 card' : `${count} cards`,
-
-progress: (flipped: number, total: number) =>
-`${flipped} / ${total} cards revealed`,
-modeLabel: 'How do you want to hear this?',
-modeSoft: 'Soft',
-modeDirect: 'Direct'
-},
-questions: {
-  1: [
-    'What is the core of this situation right now?',
-    'What needs deeper understanding?',
-    'What energy defines this moment?'
-  ],
-  2: [
-    'What supports me and what holds me back?',
-    'What is internal influence and what is external influence?',
-    'What do I want and what do I need?'
-  ],
-  3: [
-    'Past – Present – Future',
-    'Situation – Challenge – Guidance',
-    'What is visible – What is hidden – What is emerging'
-  ]
-},
-scroll: {
-  title: 'Choose a thread to follow',
-  hint: 'Swipe or turn, tap to choose'
-},
-prompt: {
-interpretationHeader: 'Your interpretation',
-header: 'Tarot prompt – ready to copy',
-copy: 'Copy',
-copied: 'Copied ✓',
-    disclaimer: {
-      base: 'The question and interpretation are created by you. The tool only helps structure a tarot prompt for reflection or further interpretation.',
-      soft: 'This interpretation is meant for reflection. Take what resonates and leave the rest.',
-      direct: 'This interpretation offers a clear direction based on the cards. It is not absolute truth, but it does not avoid giving a concrete answer.'
+      progress: (flipped: number, total: number) =>
+        `${flipped} / ${total} cards revealed`,
+      modeLabel: 'How do you want to hear this?',
+      modeSoft: 'Soft',
+      modeDirect: 'Direct',
+      deckButton: 'Deck'
     },
+    questions: {
+      1: [
+        'What is the core of this situation right now?',
+        'What needs deeper understanding?',
+        'What energy defines this moment?'
+      ],
+      2: [
+        'What supports me and what holds me back?',
+        'What is internal influence and what is external influence?',
+        'What do I want and what do I need?'
+      ],
+      3: [
+        'Past – Present – Future',
+        'Situation – Challenge – Guidance',
+        'What is visible – What is hidden – What is emerging'
+      ]
+    },
+    scroll: {
+      title: 'Choose a thread to follow',
+      hint: 'Swipe or turn, tap to choose'
+    },
+    prompt: {
+      interpretationHeader: 'Your interpretation',
+      header: 'Tarot prompt – ready to copy',
+      copy: 'Copy',
+      copied: 'Copied ✓',
+      disclaimer: {
+        base: 'The question and interpretation are created by you. The tool only helps structure a tarot prompt for reflection or further interpretation.',
+        soft: 'This interpretation is meant for reflection. Take what resonates and leave the rest.',
+        direct: 'This interpretation offers a clear direction based on the cards. It is not absolute truth, but it does not avoid giving a concrete answer.'
+      },
 
-title: 'Tarot reading – interpretation requested',
+      title: 'Tarot reading – interpretation requested',
 
-questionIntro: 'I asked the following question:',
+      questionIntro: 'I asked the following question:',
 
-cardsIntro: (count: number) =>
-`I drew ${count} tarot card${count > 1 ? 's' : ''}:`,
+      cardsIntro: (count: number) =>
+        `I drew ${count} tarot card${count > 1 ? 's' : ''}:`,
 
-frames: {
-one: `Interpret this card as an overall message connected to the question.
+      frames: {
+        one: `Interpret this card as an overall message connected to the question.
 Focus on insight, direction and awareness rather than detailed predictions.`,
 
-two: `Interpret the cards as two perspectives illuminating the question from different angles.
+        two: `Interpret the cards as two perspectives illuminating the question from different angles.
 Focus on how they interact, contrast or complement each other.`,
 
-three: `Interpret the tarot reading as a whole, not just card by card.
+        three: `Interpret the tarot reading as a whole, not just card by card.
 Focus on the overall theme, how the cards interact and what guidance is relevant to the question.`
-},
+      },
 
-directFrames: {
-  one: `Give a clear and direct message connected to the question. Avoid overly open interpretation — what does this clearly point to?`,
+      directFrames: {
+        one: `Give a clear and direct message connected to the question. Avoid overly open interpretation — what does this clearly point to?`,
 
-  two: `Interpret the cards as tension or conflict. What is blocking you and what pushes forward? Be concrete.`,
+        two: `Interpret the cards as tension or conflict. What is blocking you and what pushes forward? Be concrete.`,
 
-  three: `Look at the whole and point to a clear direction. What needs to be done now, despite hesitation or resistance?`
-},
+        three: `Look at the whole and point to a clear direction. What needs to be done now, despite hesitation or resistance?`
+      },
 
-tone:
-'The interpretation should be reflective, grounded and supportive — not predictive or absolute.',
+      tone:
+        'The interpretation should be reflective, grounded and supportive — not predictive or absolute.',
 
-directTone:
-'Be clear, concrete and slightly challenging. Avoid fluff and vague language.',
+      directTone:
+        'Be clear, concrete and slightly challenging. Avoid fluff and vague language.',
 
-summary:
-'End with a short summary of the core message.'
-}
-}
+      summary:
+        'End with a short summary of the core message.'
+    }
+  }
 };
