@@ -110,6 +110,11 @@
 
 		if (isReady) {
 			isDealing = false;
+
+			// 🔥 vibration (om device stödjer det)
+			if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+				navigator.vibrate(20);
+			}
 		}
 	}
 

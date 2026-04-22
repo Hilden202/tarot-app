@@ -100,7 +100,6 @@
 	.card.nonInteractive {
 		cursor: default;
 		opacity: 0.85;
-		transform: scale(0.96);
 	}
 
 	.card:not(.imageReady) {
