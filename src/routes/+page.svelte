@@ -239,7 +239,8 @@
 			// lägg i selectedCards
 			returnSelected.push(card);
 		}
-		await preloadCards(returnSelected);
+		// Start preloading in parallel (do not block dealing)
+		preloadCards(returnSelected);
 
 		for (const card of returnSelected) {
 			selectedCards = [...selectedCards, card];
