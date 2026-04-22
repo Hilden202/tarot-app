@@ -1,11 +1,14 @@
 ﻿<script lang="ts">
 	import type { TarotCardData } from '$lib/data/tarotDeck';
 	import { base } from '$app/paths';
+	import { createEventDispatcher } from 'svelte';
 
 	export let card: TarotCardData;
 	export let isInteractive = true;
 
 	export let onFlipChange: (payload: { id: string; isFlipped: boolean }) => void = () => {};
+
+	const dispatch = createEventDispatcher();
 
 	let isFlipped = false;
 
@@ -20,6 +23,11 @@
 			isFlipped
 		});
 	}
+
+	function handleAnimationEnd() {
+		// notify parent that this card finished its deal animation
+		dispatch('dealt', { id: card.id });
+	}
 </script>
 
 <button
@@ -27,6 +35,7 @@
 	class:flipped={isFlipped}
 	class:nonInteractive={!isInteractive}
 	on:click={flipCard}
+	on:animationend={handleAnimationEnd}
 >
 	<!-- Baksida -->
 	<div class="backCard">

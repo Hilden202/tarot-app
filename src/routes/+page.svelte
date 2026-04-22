@@ -31,6 +31,8 @@
 
 	let hasDrawn = false;
 	let isDealing = false;
+	let isReady = false;
+	let dealtIds = new Set<string>();
 
 	let selectedSuggestionIndex: number | null = null;
 	// Tracks whether the current question was auto-filled from suggestions
@@ -176,6 +178,8 @@
 		scrollQuestionIndex = 0;
 		hasDrawn = false;
 		isDealing = false;
+		isReady = false;
+		dealtIds = new Set<string>();
 		hasSelectedMode = false;
 		interpretation = '';
 		error = '';
@@ -188,7 +192,7 @@
 	}
 
 	function handleFlipChange(payload: { id: string; isFlipped: boolean }) {
-		if (isDealing) return;
+		if (!isReady) return;
 
 		const next = new Set(flippedIds);
 
@@ -236,6 +240,8 @@
 		hasDrawn = false;
 		isDealing = true;
 		drawId++;
+		dealtIds = new Set<string>();
+		isReady = false;
 
 		// skapa nytt kort
 		const deckCopy = [...tarotDeck];
@@ -259,7 +265,21 @@
 		}
 
 		hasDrawn = true;
-		isDealing = false;
+		// isDealing sätts när alla kort är klara
+	}
+
+	function handleCardDealt(event: CustomEvent<{ id: string }>) {
+		const id = event.detail.id;
+
+		const next = new Set(dealtIds);
+		next.add(id);
+		dealtIds = next;
+
+		// När ALLA kort rapporterat klart
+		if (dealtIds.size === selectedCards.length && selectedCards.length > 0) {
+			isReady = true;
+			isDealing = false;
+		}
 	}
 
 	function selectMode(selected: 'soft' | 'direct') {
@@ -372,7 +392,12 @@
 				</div>
 			{:else if selectedCards.length > 0}
 				{#each selectedCards as card (`${drawId}-${card.id}`)}
-					<TarotCard {card} isInteractive={!isDealing} onFlipChange={handleFlipChange} />
+					<TarotCard
+						{card}
+						isInteractive={isReady}
+						onFlipChange={handleFlipChange}
+						on:dealt={handleCardDealt}
+					/>
 				{/each}
 			{/if}
 		</section>
