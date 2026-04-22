@@ -72,7 +72,12 @@
 					new Promise<void>((resolve) => {
 						const img = new Image();
 
-						img.onload = () => resolve();
+						img.onload = async () => {
+							try {
+								await img.decode();
+							} catch {}
+							resolve();
+						};
 						img.onerror = () => resolve();
 						img.src = `${base}/tarot/cards/${card.image}`;
 
@@ -205,13 +210,19 @@
 		const cachedInterpretation = mode ? interpretationCache[lang]?.[mode] : undefined;
 
 		if (cachedInterpretation) {
-			if (loadedInterpretationKey !== interpretationKey || interpretation !== cachedInterpretation) {
+			if (
+				loadedInterpretationKey !== interpretationKey ||
+				interpretation !== cachedInterpretation
+			) {
 				showCachedInterpretation(cachedInterpretation, interpretationKey);
 			}
 		} else if (loadedInterpretationKey === interpretationKey) {
 			clearInterpretationState();
 			loadedInterpretationKey = '';
-		} else if (failedInterpretationKey !== interpretationKey && activeFetchKey !== interpretationKey) {
+		} else if (
+			failedInterpretationKey !== interpretationKey &&
+			activeFetchKey !== interpretationKey
+		) {
 			fetchInterpretation(interpretationKey, lang, selectedMode);
 		}
 	}
@@ -276,7 +287,8 @@
 	) {
 		if (!question.trim() || selectedCards.length === 0) return;
 		if (!hasSelectedMode) return;
-		if (activeFetchKey === interpretationKey || failedInterpretationKey === interpretationKey) return;
+		if (activeFetchKey === interpretationKey || failedInterpretationKey === interpretationKey)
+			return;
 
 		try {
 			activeFetchKey = interpretationKey;
@@ -439,17 +451,19 @@
 					<p>{t.page.modeLabel}</p>
 
 					<div class="mode-buttons">
-						<Button 
+						<Button
 							on:click={() => selectMode('soft')}
 							disabled={isLoading}
-							variant={mode === 'soft' && hasSelectedMode ? 'primary' : 'ghost'}>
+							variant={mode === 'soft' && hasSelectedMode ? 'primary' : 'ghost'}
+						>
 							😇 {t.page.modeSoft}
 						</Button>
 
-						<Button 
+						<Button
 							on:click={() => selectMode('direct')}
 							disabled={isLoading}
-							variant={mode === 'direct' && hasSelectedMode ? 'primary' : 'ghost'}>
+							variant={mode === 'direct' && hasSelectedMode ? 'primary' : 'ghost'}
+						>
 							😈 {t.page.modeDirect}
 						</Button>
 					</div>

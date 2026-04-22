@@ -35,7 +35,12 @@
 
 	<!-- Framsida -->
 	<div class="frontCard">
-		<img src={`${base}/tarot/cards/${card.image}`} alt={card.fullTitle} />
+		<img
+			src={`${base}/tarot/cards/${card.image}`}
+			alt={card.fullTitle}
+			loading="eager"
+			decoding="async"
+		/>
 	</div>
 </button>
 
