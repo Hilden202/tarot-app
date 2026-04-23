@@ -57,24 +57,76 @@
 	let failedInterpretationKey = '';
 
 	let mode: 'soft' | 'direct' | null = null;
+	let deckPreloadIndex = 0;
+	let deckPreloadTimer: ReturnType<typeof setTimeout> | null = null;
+	let hasStartedDeckPreload = false;
+	let isDeckPreloadInFlight = false;
+
+	const DECK_PRELOAD_START_DELAY_MS = 1000;
+	const DECK_PRELOAD_STEP_DELAY_MS = 120;
 
 	onMount(() => {
 		const img = new Image();
 		img.src = `${base}/${cardBackImage}`;
 
-		// preloada hela kortleken i bakgrunden (lugnt)
-		setTimeout(() => {
-			preloadDeckImages();
-		}, 1000);
+		const startDeckPreload = () => {
+			hasStartedDeckPreload = true;
+			void preloadDeckImages();
+		};
+
+		// Starta hela kortleken först när sidan är lugn.
+		if ('requestIdleCallback' in window) {
+			const idleId = window.requestIdleCallback(
+				() => {
+					startDeckPreload();
+				},
+				{ timeout: DECK_PRELOAD_START_DELAY_MS }
+			);
+
+			return () => {
+				window.cancelIdleCallback(idleId);
+				if (deckPreloadTimer) clearTimeout(deckPreloadTimer);
+			};
+		}
+
+		deckPreloadTimer = setTimeout(() => {
+			deckPreloadTimer = null;
+			startDeckPreload();
+		}, DECK_PRELOAD_START_DELAY_MS);
+
+		return () => {
+			if (deckPreloadTimer) clearTimeout(deckPreloadTimer);
+		};
 	});
 
 	const DEAL_DELAY_MS = 160;
 
-	function preloadDeckImages() {
-		tarotDeck.forEach((card) => {
-			const img = new Image();
-			img.src = `${base}/tarot/cards/${card.image}`;
-		});
+	function scheduleNextDeckPreload() {
+		if (deckPreloadTimer) clearTimeout(deckPreloadTimer);
+		deckPreloadTimer = setTimeout(() => {
+			deckPreloadTimer = null;
+			void preloadDeckImages();
+		}, DECK_PRELOAD_STEP_DELAY_MS);
+	}
+
+	async function preloadDeckImages() {
+		if (isDealing || isDeckPreloadInFlight || deckPreloadIndex >= tarotDeck.length) return;
+
+		const card = tarotDeck[deckPreloadIndex];
+		const img = new Image();
+		img.decoding = 'async';
+		img.fetchPriority = 'low';
+		isDeckPreloadInFlight = true;
+
+		const advance = () => {
+			isDeckPreloadInFlight = false;
+			deckPreloadIndex += 1;
+			scheduleNextDeckPreload();
+		};
+
+		img.onload = advance;
+		img.onerror = advance;
+		img.src = `${base}/tarot/cards/${card.image}`;
 	}
 
 	function wait(ms: number) {
@@ -88,6 +140,8 @@
 					new Promise<void>((resolve) => {
 						const img = new Image();
 						let isSettled = false;
+						img.fetchPriority = 'high';
+						img.decoding = 'sync';
 
 						const finalize = async () => {
 							if (isSettled) return;
@@ -326,6 +380,16 @@
 		next.add(id);
 		imageReadyIds = next;
 		updateReadyState();
+	}
+
+	$: if (
+		hasStartedDeckPreload &&
+		!isDealing &&
+		!isDeckPreloadInFlight &&
+		deckPreloadIndex < tarotDeck.length &&
+		!deckPreloadTimer
+	) {
+		scheduleNextDeckPreload();
 	}
 
 	function selectMode(selected: 'soft' | 'direct') {
