@@ -287,7 +287,7 @@
 	}
 
 	function handleFlipChange(payload: { id: string; isFlipped: boolean }) {
-		if (!isReady) return;
+		if (!isReady || isDealing) return;
 
 		const next = new Set(flippedIds);
 
@@ -493,7 +493,7 @@
 			</div>
 		</header>
 
-		<section class="cards">
+		<section class="cards" class:dealing={isDealing}>
 			{#if !hasDrawn && !isDealing}
 				<div class="veil-slot">
 					<div class="theVeil">
@@ -790,6 +790,16 @@
 	.controls {
 		display: flex;
 		justify-content: center;
+	}
+
+	.cards.dealing {
+		pointer-events: none;
+		cursor: progress;
+	}
+
+	.cards.dealing :global(.card) {
+		opacity: 0.85;
+		transform: scale(0.98);
 	}
 
 	.control-inner {
