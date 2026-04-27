@@ -9,13 +9,13 @@
 
 	export let onFlipChange: (payload: { id: string; isFlipped: boolean }) => void = () => {};
 	export let isReady = false;
+	export let isFlipped = false;
 
 	const dispatch = createEventDispatcher<{
 		dealt: { id: string };
 		imageready: { id: string };
 	}>();
 
-	let isFlipped = false;
 	let frontImageEl: HTMLImageElement | null = null;
 	let isImageReady = false;
 

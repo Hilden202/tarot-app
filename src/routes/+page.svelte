@@ -13,24 +13,17 @@
 	import TarotPrompt from '$lib/components/TarotPrompt.svelte';
 	import { goto } from '$app/navigation';
 	import { preloadCardBackImage } from '$lib/images/cardBack';
+	import { createTarotSession, tarotSession, type TarotMode } from '$lib/stores/tarotSession';
 
 	const guideImage = 'intro/the_veil.png';
 
 	let t;
 
-	let selectedCards: TarotCardData[] = [];
-
 	let allCardsFlipped: boolean = false;
-	let flippedIds = new Set<string>();
-
-	let question = '';
-
-	let drawId = 0;
 
 	let cardCount: 1 | 2 | 3 = 3;
 	// restrict to valid spread sizes
 
-	let hasDrawn = false;
 	let isDealing = false;
 	let isReady = false;
 	let dealtIds = new Set<string>();
@@ -43,7 +36,6 @@
 	let previousCardCount: 1 | 2 | 3 = cardCount;
 	// Used to detect spread size changes
 
-	let interpretation: string = '';
 	let isLoading = false;
 	let error: string = '';
 	let hasSelectedMode = false;
@@ -51,12 +43,10 @@
 	let displayedInterpretation: string = '';
 	let typingInterval: ReturnType<typeof setInterval> | null = null;
 
-	let interpretationCache: Record<string, Record<string, string>> = {};
 	let activeFetchKey = '';
 	let loadedInterpretationKey = '';
 	let failedInterpretationKey = '';
 
-	let mode: 'soft' | 'direct' | null = null;
 	let deckPreloadIndex = 0;
 	let deckPreloadTimer: ReturnType<typeof setTimeout> | null = null;
 	let hasStartedDeckPreload = false;
@@ -171,7 +161,7 @@
 	}
 
 	function updateReadyState() {
-		const totalCards = selectedCards.length;
+		const totalCards = $tarotSession.selectedCards.length;
 		isReady = totalCards > 0 && dealtIds.size === totalCards && imageReadyIds.size === totalCards;
 
 		if (isReady) {
@@ -212,20 +202,20 @@
 
 	function getInterpretationKey(
 		lang: 'sv' | 'en' = $language ?? 'sv',
-		selectedMode: 'soft' | 'direct' = mode ?? 'soft'
+		selectedMode: TarotMode = $tarotSession.mode ?? 'soft'
 	) {
 		return [
-			drawId,
+			$tarotSession.drawId,
 			lang,
 			selectedMode,
-			question.trim(),
-			selectedCards.map((card) => card.id).join(',')
+			$tarotSession.question.trim(),
+			$tarotSession.selectedCards.map((card) => card.id).join(',')
 		].join('|');
 	}
 
 	function clearInterpretationState() {
 		stopTyping();
-		interpretation = '';
+		$tarotSession.interpretation = '';
 		displayedInterpretation = '';
 		error = '';
 	}
@@ -235,25 +225,29 @@
 		isLoading = false;
 		failedInterpretationKey = '';
 		loadedInterpretationKey = key;
-		interpretation = cachedInterpretation;
+		$tarotSession.interpretation = cachedInterpretation;
 		startTyping(cachedInterpretation);
 	}
 
 	$: t = translations[$language ?? 'sv'];
+	$: hasSelectedMode = $tarotSession.mode !== null;
+	$: if ($tarotSession.interpretation && !displayedInterpretation && !isLoading) {
+		displayedInterpretation = $tarotSession.interpretation;
+	}
 
 	$: visibleQuestions = t.questions[cardCount].slice(0, 3);
 
 	// If a suggestion is selected, keep the question synced with
 	// the current language and spread size (same index, new text)
 	$: if (selectedSuggestionIndex !== null) {
-		question = t.questions[cardCount][selectedSuggestionIndex];
+		$tarotSession.question = t.questions[cardCount][selectedSuggestionIndex];
 	}
 
 	$: if (cardCount !== previousCardCount) {
 		// If the spread size changes and the question was auto-filled,
 		// clear it to avoid mismatched spread/question context
 		if (selectedSuggestionIndex !== null) {
-			question = '';
+			$tarotSession.question = '';
 			selectedSuggestionIndex = null;
 		}
 		scrollQuestionIndex = 0;
@@ -264,21 +258,15 @@
 
 	function resetDraw() {
 		stopTyping();
-		selectedCards = [];
-		flippedIds = new Set<string>();
-		question = '';
+		$tarotSession = createTarotSession();
 		selectedSuggestionIndex = null;
 		scrollQuestionIndex = 0;
-		hasDrawn = false;
 		isDealing = false;
 		isReady = false;
 		dealtIds = new Set<string>();
 		imageReadyIds = new Set<string>();
-		hasSelectedMode = false;
-		interpretation = '';
 		error = '';
 		isLoading = false;
-		interpretationCache = {};
 		activeFetchKey = '';
 		loadedInterpretationKey = '';
 		failedInterpretationKey = '';
@@ -288,7 +276,7 @@
 	function handleFlipChange(payload: { id: string; isFlipped: boolean }) {
 		if (!isReady || isDealing) return;
 
-		const next = new Set(flippedIds);
+		const next = new Set($tarotSession.flippedIds);
 
 		if (payload.isFlipped) {
 			next.add(payload.id);
@@ -296,21 +284,28 @@
 			next.delete(payload.id);
 		}
 
-		flippedIds = next;
+		$tarotSession.flippedIds = next;
 	}
 
-	$: allCardsFlipped = selectedCards.length > 0 && flippedIds.size === selectedCards.length;
+	$: allCardsFlipped =
+		$tarotSession.selectedCards.length > 0 &&
+		$tarotSession.flippedIds.size === $tarotSession.selectedCards.length;
 
-	$: if (allCardsFlipped && hasDrawn && hasSelectedMode) {
+	$: if (allCardsFlipped && $tarotSession.hasDrawn && hasSelectedMode) {
 		const lang = $language ?? 'sv';
-		const selectedMode = mode ?? undefined;
+		const selectedMode = $tarotSession.mode ?? 'soft';
 		const interpretationKey = getInterpretationKey(lang, selectedMode);
-		const cachedInterpretation = mode ? interpretationCache[lang]?.[mode] : undefined;
+		const cachedInterpretation = $tarotSession.mode
+			? $tarotSession.interpretationCache[lang]?.[$tarotSession.mode]
+			: undefined;
 
 		if (cachedInterpretation) {
-			if (
+			if ($tarotSession.interpretation === cachedInterpretation) {
+				loadedInterpretationKey = interpretationKey;
+				failedInterpretationKey = '';
+			} else if (
 				loadedInterpretationKey !== interpretationKey ||
-				interpretation !== cachedInterpretation
+				$tarotSession.interpretation !== cachedInterpretation
 			) {
 				showCachedInterpretation(cachedInterpretation, interpretationKey);
 			}
@@ -329,11 +324,11 @@
 		if (isDealing) return;
 
 		// reset
-		selectedCards = [];
-		flippedIds = new Set<string>();
-		hasDrawn = false;
+		$tarotSession.selectedCards = [];
+		$tarotSession.flippedIds = new Set<string>();
+		$tarotSession.hasDrawn = false;
 		isDealing = true;
-		drawId++;
+		$tarotSession.drawId++;
 		dealtIds = new Set<string>();
 		imageReadyIds = new Set<string>();
 		isReady = false;
@@ -355,11 +350,11 @@
 		preloadCards(returnSelected);
 
 		for (const card of returnSelected) {
-			selectedCards = [...selectedCards, card];
+			$tarotSession.selectedCards = [...$tarotSession.selectedCards, card];
 			await wait(DEAL_DELAY_MS);
 		}
 
-		hasDrawn = true;
+		$tarotSession.hasDrawn = true;
 		// isDealing sätts när alla kort är klara
 	}
 
@@ -391,13 +386,12 @@
 		scheduleNextDeckPreload();
 	}
 
-	function selectMode(selected: 'soft' | 'direct') {
-		mode = selected;
-		hasSelectedMode = true;
+	function selectMode(selected: TarotMode) {
+		$tarotSession.mode = selected;
 
 		const lang = $language ?? 'sv';
 		const interpretationKey = getInterpretationKey(lang, selected);
-		const cachedInterpretation = interpretationCache[lang]?.[selected];
+		const cachedInterpretation = $tarotSession.interpretationCache[lang]?.[selected];
 
 		if (cachedInterpretation) {
 			showCachedInterpretation(cachedInterpretation, interpretationKey);
@@ -412,9 +406,9 @@
 	async function fetchInterpretation(
 		interpretationKey = getInterpretationKey(),
 		lang: 'sv' | 'en' = $language ?? 'sv',
-		selectedMode: 'soft' | 'direct' = mode ?? 'soft'
+		selectedMode: TarotMode = $tarotSession.mode ?? 'soft'
 	) {
-		if (!question.trim() || selectedCards.length === 0) return;
+		if (!$tarotSession.question.trim() || $tarotSession.selectedCards.length === 0) return;
 		if (!hasSelectedMode) return;
 		if (activeFetchKey === interpretationKey || failedInterpretationKey === interpretationKey)
 			return;
@@ -425,13 +419,13 @@
 			error = '';
 			if (loadedInterpretationKey !== interpretationKey) {
 				stopTyping();
-				interpretation = '';
+				$tarotSession.interpretation = '';
 				displayedInterpretation = '';
 			}
 
 			const result = await interpretTarot({
-				question,
-				cards: selectedCards.map((c) => c.shortName),
+				question: $tarotSession.question,
+				cards: $tarotSession.selectedCards.map((c) => c.shortName),
 				language: lang,
 				mode: selectedMode
 			});
@@ -446,9 +440,14 @@
 				throw new Error('No interpretation returned');
 			}
 
-			if (!interpretationCache[lang]) interpretationCache[lang] = {};
-			interpretationCache[lang][selectedMode] = nextInterpretation;
-			interpretation = nextInterpretation;
+			$tarotSession.interpretationCache = {
+				...$tarotSession.interpretationCache,
+				[lang]: {
+					...$tarotSession.interpretationCache[lang],
+					[selectedMode]: nextInterpretation
+				}
+			};
+			$tarotSession.interpretation = nextInterpretation;
 			loadedInterpretationKey = interpretationKey;
 			failedInterpretationKey = '';
 			startTyping(nextInterpretation);
@@ -463,7 +462,7 @@
 			stopTyping();
 			displayedInterpretation = '';
 			error = err instanceof Error ? err.message : 'Something went wrong';
-			interpretation = '';
+			$tarotSession.interpretation = '';
 			loadedInterpretationKey = '';
 			failedInterpretationKey = interpretationKey;
 			return;
@@ -482,27 +481,28 @@
 			<h1>{t.page.title}</h1>
 
 			<div class="status">
-				{#if !hasDrawn}
+				{#if !$tarotSession.hasDrawn}
 					<p class="intro">{t.page.intro}</p>
 				{:else}
 					<p class="progress">
-						{t.page.progress(flippedIds.size, selectedCards.length)}
+						{t.page.progress($tarotSession.flippedIds.size, $tarotSession.selectedCards.length)}
 					</p>
 				{/if}
 			</div>
 		</header>
 
 		<section class="cards" class:dealing={isDealing}>
-			{#if !hasDrawn && !isDealing}
+			{#if !$tarotSession.hasDrawn && !isDealing}
 				<div class="veil-slot">
 					<div class="theVeil">
 						<img src={`${base}/tarot/${guideImage}`} alt="Tarotkort – vägledning" />
 					</div>
 				</div>
-			{:else if selectedCards.length > 0}
-				{#each selectedCards as card (`${drawId}-${card.id}`)}
+			{:else if $tarotSession.selectedCards.length > 0}
+				{#each $tarotSession.selectedCards as card (`${$tarotSession.drawId}-${card.id}`)}
 					<TarotCard
 						{card}
+						isFlipped={$tarotSession.flippedIds.has(card.id)}
 						isInteractive={isReady}
 						{isReady}
 						onFlipChange={handleFlipChange}
@@ -516,7 +516,7 @@
 		<section class="controls">
 			<div class="control-inner">
 				<div class="question">
-					{#if !hasDrawn && !isDealing}
+					{#if !$tarotSession.hasDrawn && !isDealing}
 						<div class="card-count">
 							<label>
 								<input type="radio" bind:group={cardCount} value={1} disabled={isDealing} />
@@ -538,15 +538,15 @@
 					<label>
 						<span>{t.page.questionLabel}</span>
 						<textarea
-							bind:value={question}
+							bind:value={$tarotSession.question}
 							on:input={() => {
 								selectedSuggestionIndex = null;
 							}}
 							placeholder={t.page.questionPlaceholder}
-							disabled={hasDrawn || isDealing}
+							disabled={$tarotSession.hasDrawn || isDealing}
 						></textarea>
 					</label>
-					{#if !hasDrawn && !isDealing}
+					{#if !$tarotSession.hasDrawn && !isDealing}
 						<div class="suggestions">
 							<TarotScroll
 								questions={visibleQuestions}
@@ -562,7 +562,7 @@
 									scrollQuestionIndex = event.detail.index;
 								}}
 								on:select={(event) => {
-									question = event.detail.question;
+									$tarotSession.question = event.detail.question;
 									scrollQuestionIndex = event.detail.index;
 									selectedSuggestionIndex = event.detail.index;
 								}}
@@ -570,8 +570,8 @@
 						</div>
 					{/if}
 				</div>
-				{#if !hasDrawn}
-					<Button on:click={newCards} disabled={!question.trim() || isDealing}>
+				{#if !$tarotSession.hasDrawn}
+					<Button on:click={newCards} disabled={!$tarotSession.question.trim() || isDealing}>
 						{t.page.drawButton(cardCount)}
 					</Button>
 				{:else}
@@ -596,7 +596,7 @@
 						<Button
 							on:click={() => selectMode('soft')}
 							disabled={isLoading}
-							variant={mode === 'soft' && hasSelectedMode ? 'primary' : 'ghost'}
+							variant={$tarotSession.mode === 'soft' && hasSelectedMode ? 'primary' : 'ghost'}
 						>
 							😇 {t.page.modeSoft}
 						</Button>
@@ -604,25 +604,29 @@
 						<Button
 							on:click={() => selectMode('direct')}
 							disabled={isLoading}
-							variant={mode === 'direct' && hasSelectedMode ? 'primary' : 'ghost'}
+							variant={$tarotSession.mode === 'direct' && hasSelectedMode ? 'primary' : 'ghost'}
 						>
 							😈 {t.page.modeDirect}
 						</Button>
 					</div>
 				</div>
 
-				{#if isLoading && !interpretation && !error}
+				{#if isLoading && !$tarotSession.interpretation && !error}
 					<p class="loading">Läser av korten...</p>
 				{/if}
 
-				{#if interpretation && !error}
+				{#if $tarotSession.interpretation && !error}
 					<TarotInterpretation
-						{interpretation}
+						interpretation={$tarotSession.interpretation}
 						{displayedInterpretation}
-						mode={mode ?? undefined}
+						mode={$tarotSession.mode ?? undefined}
 					/>
 				{:else if error}
-					<TarotPrompt cards={selectedCards} {question} mode={mode ?? undefined} />
+					<TarotPrompt
+						cards={$tarotSession.selectedCards}
+						question={$tarotSession.question}
+						mode={$tarotSession.mode ?? undefined}
+					/>
 				{/if}
 			</section>
 		{/if}
