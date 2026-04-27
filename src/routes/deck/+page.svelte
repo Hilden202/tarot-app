@@ -13,6 +13,7 @@
 	] as const;
 
 	$: t = translations[$language ?? 'sv'];
+	let selectedCard = null;
 </script>
 
 <div class="deck-header">
@@ -35,7 +36,7 @@
 
 		<div class="deck-grid">
 			{#each tarotDeck.filter( (card) => ('arcana' in section ? card.arcana === section.arcana : card.suit === section.suit) ) as card}
-				<div class="card-item">
+				<div class="card-item" on:click={() => selectedCard = card}>
 					<img src={`${base}/tarot/cards/${card.image}`} alt={card.fullTitle} />
 					<div class="card-title">{card.shortName}</div>
 				</div>
@@ -43,6 +44,19 @@
 		</div>
 	</section>
 {/each}
+
+{#if selectedCard}
+	<div class="modal-overlay" on:click={() => selectedCard = null}>
+		<div class="modal" on:click|stopPropagation>
+			<img src={`${base}/tarot/cards/${selectedCard.image}`} alt={selectedCard.fullTitle} />
+			<div class="modal-info">
+				<h2>{selectedCard.fullTitle}</h2>
+				<p>{selectedCard.keywords?.join(', ')}</p>
+				<p>{selectedCard.element}</p>
+			</div>
+		</div>
+	</div>
+{/if}
 
 <style>
 	.deck-header {
@@ -140,4 +154,44 @@
 			justify-self: start;
 		}
 	}
+.modal-overlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.6);
+	backdrop-filter: blur(6px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 1000;
+}
+
+.modal {
+	display: grid;
+	grid-template-columns: 300px 1fr;
+	gap: 2rem;
+	background: rgba(20, 20, 30, 0.95);
+	padding: 2rem;
+	border-radius: 16px;
+	max-width: 90vw;
+	max-height: 90vh;
+	overflow-y: auto;
+	box-shadow:
+		0 20px 60px rgba(0, 0, 0, 0.6),
+		0 0 40px rgba(120, 100, 255, 0.2);
+}
+
+.modal img {
+	width: 100%;
+	border-radius: 12px;
+}
+
+.modal-info h2 {
+	margin-top: 0;
+}
+
+@media (max-width: 700px) {
+	.modal {
+		grid-template-columns: 1fr;
+	}
+}
 </style>
