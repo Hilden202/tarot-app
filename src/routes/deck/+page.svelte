@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { tarotDeck } from '$lib/data/tarotDeck';
+	import type { TarotCardData } from '$lib/data/tarotDeck';
 	import { base } from '$app/paths';
 	import { language } from '$lib/stores/language';
 	import { translations } from '$lib/i18n/translations';
@@ -13,7 +14,7 @@
 	] as const;
 
 	$: t = translations[$language ?? 'sv'];
-	let selectedCard = null;
+	let selectedCard: TarotCardData | null = null;
 </script>
 
 <div class="deck-header">
@@ -36,7 +37,7 @@
 
 		<div class="deck-grid">
 			{#each tarotDeck.filter( (card) => ('arcana' in section ? card.arcana === section.arcana : card.suit === section.suit) ) as card}
-				<div class="card-item" on:click={() => selectedCard = card}>
+				<div class="card-item" on:click={() => selectedCard = selectedCard?.id === card.id ? null : card}>
 					<img src={`${base}/tarot/cards/${card.image}`} alt={card.fullTitle} />
 					<div class="card-title">{card.shortName}</div>
 				</div>
@@ -47,7 +48,7 @@
 
 {#if selectedCard}
 	<div class="modal-overlay" on:click={() => selectedCard = null}>
-		<div class="modal" on:click|stopPropagation>
+		<div class="modal" on:click={() => selectedCard = null}>
 			<img src={`${base}/tarot/cards/${selectedCard.image}`} alt={selectedCard.fullTitle} />
 			<div class="modal-info">
 				<h2>{selectedCard.fullTitle}</h2>
