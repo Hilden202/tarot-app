@@ -2,6 +2,7 @@
 	import type { TarotCardData } from '$lib/data/tarotDeck';
 	import { base } from '$app/paths';
 	import { createEventDispatcher, onMount, tick } from 'svelte';
+	import { cardBackImageSrc, preloadCardBackImage } from '$lib/images/cardBack';
 
 	export let card: TarotCardData;
 	export let isInteractive = true;
@@ -18,7 +19,6 @@
 	let frontImageEl: HTMLImageElement | null = null;
 	let isImageReady = false;
 
-	const backImage = 'back/TarotKort_Baksida.png';
 	function flipCard() {
 		if (!isInteractive || !isImageReady) return;
 
@@ -49,6 +49,7 @@
 	}
 
 	onMount(async () => {
+		void preloadCardBackImage();
 		await tick();
 		void markImageReady();
 	});
@@ -65,7 +66,7 @@
 >
 	<!-- Baksida -->
 	<div class="backCard">
-		<img src={`${base}/tarot/${backImage}`} alt="Tarotkort – baksida" />
+		<img src={cardBackImageSrc} alt="Tarotkort – baksida" loading="eager" decoding="sync" />
 	</div>
 
 	<!-- Framsida -->

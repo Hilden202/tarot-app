@@ -12,9 +12,9 @@
 	import { onMount } from 'svelte';
 	import TarotPrompt from '$lib/components/TarotPrompt.svelte';
 	import { goto } from '$app/navigation';
+	import { preloadCardBackImage } from '$lib/images/cardBack';
 
 	const guideImage = 'intro/the_veil.png';
-	const cardBackImage = 'tarot/back/TarotKort_Baksida.png';
 
 	let t;
 
@@ -66,8 +66,7 @@
 	const DECK_PRELOAD_STEP_DELAY_MS = 120;
 
 	onMount(() => {
-		const img = new Image();
-		img.src = `${base}/${cardBackImage}`;
+		void preloadCardBackImage();
 
 		const startDeckPreload = () => {
 			hasStartedDeckPreload = true;
