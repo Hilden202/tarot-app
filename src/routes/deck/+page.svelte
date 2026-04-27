@@ -13,8 +13,14 @@
 		{ id: 'stones', suit: 'Stones' }
 	] as const;
 
-	$: t = translations[$language ?? 'sv'];
+	$: currentLang = $language ?? 'sv';
+	$: t = translations[currentLang];
 	let selectedCard: TarotCardData | null = null;
+	$: translatedKeywords = selectedCard
+		? selectedCard.keywords.map((keyword) =>
+				currentLang === 'en' ? t.keywordMap[keyword] ?? keyword : keyword
+			)
+		: [];
 </script>
 
 <div class="deck-header">
@@ -52,8 +58,14 @@
 			<img src={`${base}/tarot/cards/${selectedCard.image}`} alt={selectedCard.fullTitle} />
 			<div class="modal-info">
 				<h2>{selectedCard.fullTitle}</h2>
-				<p>{selectedCard.keywords?.join(', ')}</p>
-				<p>{selectedCard.element}</p>
+				<p>
+					<strong>{t.deck.modal.keywords}:</strong>
+					{translatedKeywords.join(', ')}
+				</p>
+				<p>
+					<strong>{t.deck.modal.element}:</strong>
+					{t.elements[translations.sv.elementMap[selectedCard.element]]}
+				</p>
 			</div>
 		</div>
 	</div>

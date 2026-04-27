@@ -1,5 +1,7 @@
 export type Lang = 'sv' | 'en';
 
+type ElementKey = 'fire' | 'water' | 'earth' | 'air';
+
 type TranslationSchema = {
 	page: {
 		title: string;
@@ -21,6 +23,10 @@ type TranslationSchema = {
 		wipNote: string;
 		cardCount: (count: number) => string;
 		backButton: string;
+		modal: {
+			keywords: string;
+			element: string;
+		};
 		sections: {
 			major: string;
 			cups: string;
@@ -29,6 +35,12 @@ type TranslationSchema = {
 			stones: string;
 		};
 	};
+
+	elements: Record<ElementKey, string>;
+
+	elementMap: Record<string, ElementKey>;
+
+	keywordMap: Record<string, string>;
 
 	questions: {
 		1: string[];
@@ -98,6 +110,10 @@ export const translations: Record<Lang, TranslationSchema> = {
 			wipNote: 'Denna sida är under utveckling. Vissa funktioner och översättningar saknas.',
 			cardCount: (count: number) => `Antal kort: ${count}`,
 			backButton: 'Tillbaka',
+			modal: {
+				keywords: 'Nyckelord',
+				element: 'Element'
+			},
 			sections: {
 				major: 'Major Arcana',
 				cups: 'Bägare',
@@ -106,6 +122,19 @@ export const translations: Record<Lang, TranslationSchema> = {
 				stones: 'Stenar'
 			}
 		},
+		elements: {
+			fire: 'Eld',
+			water: 'Vatten',
+			earth: 'Jord',
+			air: 'Luft'
+		},
+		elementMap: {
+			Eld: 'fire',
+			Vatten: 'water',
+			Jord: 'earth',
+			Luft: 'air'
+		},
+		keywordMap: {},
 		questions: {
 			1: [
 				'Vad är kärnan i situationen just nu?',
@@ -193,6 +222,10 @@ Fokusera på det övergripande temat, hur korten samspelar och vilken väglednin
 			wipNote: 'This page is under development. Some features and translations are missing.',
 			cardCount: (count: number) => `Number of cards: ${count}`,
 			backButton: 'Back',
+			modal: {
+				keywords: 'Keywords',
+				element: 'Element'
+			},
 			sections: {
 				major: 'Major Arcana',
 				cups: 'Cups',
@@ -200,6 +233,171 @@ Fokusera på det övergripande temat, hur korten samspelar och vilken väglednin
 				swords: 'Swords',
 				stones: 'Stones'
 			}
+		},
+		elements: {
+			fire: 'Fire',
+			water: 'Water',
+			earth: 'Earth',
+			air: 'Air'
+		},
+		elementMap: {
+			Eld: 'fire',
+			Vatten: 'water',
+			Jord: 'earth',
+			Luft: 'air'
+		},
+		keywordMap: {
+			acceptans: 'acceptance',
+			ambivalens: 'ambivalence',
+			analys: 'analysis',
+			'andlig väg': 'spiritual path',
+			ansvar: 'responsibility',
+			arv: 'inheritance',
+			autenticitet: 'authenticity',
+			auktoritet: 'authority',
+			avståndstagande: 'withdrawal',
+			balans: 'balance',
+			belöning: 'reward',
+			beroende: 'dependency',
+			begränsning: 'limitation',
+			brist: 'lack',
+			bundenhet: 'bondage',
+			börda: 'burden',
+			början: 'beginning',
+			cykler: 'cycles',
+			driv: 'drive',
+			drömmar: 'dreams',
+			ego: 'ego',
+			'emotionell mognad': 'emotional maturity',
+			ensamhet: 'solitude',
+			entusiasm: 'enthusiasm',
+			erkännande: 'recognition',
+			eftertanke: 'reflection',
+			firande: 'celebration',
+			flöde: 'flow',
+			fokus: 'focus',
+			frihet: 'freedom',
+			friktion: 'friction',
+			fullbordan: 'completion',
+			förfining: 'refinement',
+			förlust: 'loss',
+			förlåtelse: 'forgiveness',
+			försvar: 'defense',
+			förvandling: 'transformation',
+			förvirring: 'confusion',
+			förändring: 'change',
+			framgång: 'success',
+			framåtblick: 'foresight',
+			glädje: 'joy',
+			grund: 'foundation',
+			hantverk: 'craft',
+			harmoni: 'harmony',
+			helhet: 'wholeness',
+			hopp: 'hope',
+			idealism: 'idealism',
+			illusion: 'illusion',
+			impuls: 'impulse',
+			'inre visdom': 'inner wisdom',
+			'inre styrka': 'inner strength',
+			insikt: 'insight',
+			inspiration: 'inspiration',
+			integration: 'integration',
+			integritet: 'integrity',
+			intellekt: 'intellect',
+			intuition: 'intuition',
+			kamp: 'struggle',
+			kallelse: 'calling',
+			klarhet: 'clarity',
+			kollaps: 'collapse',
+			kontroll: 'control',
+			kraft: 'power',
+			kreativitet: 'creativity',
+			känsla: 'feeling',
+			känslighet: 'sensitivity',
+			kärlek: 'love',
+			ledarskap: 'leadership',
+			ledning: 'leadership',
+			livskraft: 'vitality',
+			logik: 'logic',
+			lycka: 'happiness',
+			läkning: 'healing',
+			lärande: 'learning',
+			lära: 'teaching',
+			manifestation: 'manifestation',
+			materia: 'matter',
+			medkänsla: 'compassion',
+			'mental låsning': 'mental block',
+			mod: 'courage',
+			mysterium: 'mystery',
+			nostalgi: 'nostalgia',
+			nyfikenhet: 'curiosity',
+			näring: 'nourishment',
+			närvaro: 'presence',
+			omsorg: 'care',
+			oro: 'worry',
+			oskuldsfullhet: 'innocence',
+			otålighet: 'impatience',
+			paus: 'pause',
+			perspektiv: 'perspective',
+			potential: 'potential',
+			prövning: 'trial',
+			pånyttfödelse: 'rebirth',
+			reflektion: 'reflection',
+			relation: 'relationship',
+			riktning: 'direction',
+			romantik: 'romance',
+			rörelse: 'movement',
+			samverkan: 'collaboration',
+			sanning: 'truth',
+			självständighet: 'independence',
+			självsäkerhet: 'confidence',
+			skapande: 'creation',
+			skaparkraft: 'creative force',
+			skapelse: 'creation',
+			skugga: 'shadow',
+			skärpa: 'sharpness',
+			snabbhet: 'speed',
+			slut: 'ending',
+			slutpunkt: 'endpoint',
+			smärta: 'pain',
+			sorg: 'grief',
+			språng: 'leap',
+			stabilitet: 'stability',
+			stillhet: 'stillness',
+			struktur: 'structure',
+			styrka: 'strength',
+			sökande: 'seeking',
+			tillit: 'trust',
+			tillfredsställelse: 'satisfaction',
+			tempo: 'pace',
+			timing: 'timing',
+			tradition: 'tradition',
+			tro: 'faith',
+			trygghet: 'security',
+			tvivel: 'doubt',
+			tålamod: 'patience',
+			undvikande: 'avoidance',
+			uppoffring: 'sacrifice',
+			uppvaknande: 'awakening',
+			utforskande: 'exploration',
+			uthållighet: 'endurance',
+			utbyte: 'exchange',
+			val: 'choice',
+			visdom: 'wisdom',
+			vila: 'rest',
+			vilja: 'will',
+			viljestyrka: 'willpower',
+			vision: 'vision',
+			värderingar: 'values',
+			återhämtning: 'recovery',
+			ångest: 'anxiety',
+			ärlighet: 'honesty',
+			öde: 'fate',
+			ömsesidighet: 'mutuality',
+			öppning: 'opening',
+			överansvar: 'over-responsibility',
+			överflöd: 'abundance',
+			övergång: 'transition'
 		},
 		questions: {
 			1: [
