@@ -231,7 +231,12 @@
 
 	$: t = translations[$language ?? 'sv'];
 	$: hasSelectedMode = $tarotSession.mode !== null;
-	$: if ($tarotSession.interpretation && !displayedInterpretation && !isLoading) {
+	$: if (
+		$tarotSession.interpretation &&
+		!displayedInterpretation &&
+		!isLoading &&
+		!typingInterval
+	) {
 		displayedInterpretation = $tarotSession.interpretation;
 	}
 
