@@ -14,23 +14,27 @@
 	] as const;
 
 	let touchStartX = 0;
-	let touchEndX = 0;
+	let touchStartY = 0;
 
 	function handleTouchStart(e: TouchEvent) {
-		touchStartX = e.touches[0].clientX;
+		const touch = e.touches[0];
+		touchStartX = touch.clientX;
+		touchStartY = touch.clientY;
 	}
 
-	function handleTouchMove(e: TouchEvent) {
-		touchEndX = e.touches[0].clientX;
-	}
+	function handleTouchEnd(e: TouchEvent) {
+		const touch = e.changedTouches[0];
+		const diffX = touch.clientX - touchStartX;
+		const diffY = touch.clientY - touchStartY;
 
-	function handleTouchEnd() {
-		const diff = touchEndX - touchStartX;
+		const isHorizontal = Math.abs(diffX) > Math.abs(diffY);
 
-		// swipe från vänster kant → back
-		if (touchStartX < 50 && diff > 80 && !selectedCard) {
+		if (touchStartX < 50 && diffX > 80 && isHorizontal && !selectedCard) {
 			history.back();
 		}
+
+		touchStartX = 0;
+		touchStartY = 0;
 	}
 
 	$: currentLang = $language ?? 'sv';
@@ -43,7 +47,7 @@
 		: [];
 </script>
 
-<div on:touchstart={handleTouchStart} on:touchmove={handleTouchMove} on:touchend={handleTouchEnd}>
+<div on:touchstart={handleTouchStart} on:touchend={handleTouchEnd}>
 	<div class="deck-header">
 		<button class="back-button" on:click={() => history.back()}>
 			<span aria-hidden="true">←</span>
@@ -97,6 +101,10 @@
 </div>
 
 <style>
+	:global(body) {
+		touch-action: pan-y;
+	}
+
 	.deck-header {
 		display: grid;
 		grid-template-columns: minmax(6rem, 1fr) auto minmax(6rem, 1fr);
