@@ -27,9 +27,17 @@
 		const diffX = touch.clientX - touchStartX;
 		const diffY = touch.clientY - touchStartY;
 
-		const isHorizontal = Math.abs(diffX) > Math.abs(diffY);
+		// 🔥 more forgiving swipe detection
+		const edgeThreshold = window.innerWidth * 0.2; // 20% of screen width
+		const minSwipeDistance = 60; // easier to trigger
+		const isStrongHorizontal = Math.abs(diffX) > Math.abs(diffY) * 1.2;
 
-		if (touchStartX < 80 && diffX > 80 && isHorizontal && !selectedCard) {
+		if (
+			touchStartX < edgeThreshold &&
+			diffX > minSwipeDistance &&
+			isStrongHorizontal &&
+			!selectedCard
+		) {
 			history.back();
 		}
 
