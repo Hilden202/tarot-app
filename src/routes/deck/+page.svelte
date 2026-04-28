@@ -29,7 +29,7 @@
 
 		const isHorizontal = Math.abs(diffX) > Math.abs(diffY);
 
-		if (touchStartX < 50 && diffX > 80 && isHorizontal && !selectedCard) {
+		if (touchStartX < 80 && diffX > 80 && isHorizontal && !selectedCard) {
 			history.back();
 		}
 
@@ -102,7 +102,7 @@
 
 <style>
 	:global(body) {
-		touch-action: pan-y;
+		touch-action: auto;
 	}
 
 	.deck-header {
