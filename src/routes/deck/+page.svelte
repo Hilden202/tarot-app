@@ -13,63 +13,88 @@
 		{ id: 'stones', suit: 'Stones' }
 	] as const;
 
+	let touchStartX = 0;
+	let touchEndX = 0;
+
+	function handleTouchStart(e: TouchEvent) {
+		touchStartX = e.touches[0].clientX;
+	}
+
+	function handleTouchMove(e: TouchEvent) {
+		touchEndX = e.touches[0].clientX;
+	}
+
+	function handleTouchEnd() {
+		const diff = touchEndX - touchStartX;
+
+		// swipe från vänster kant → back
+		if (touchStartX < 50 && diff > 80 && !selectedCard) {
+			history.back();
+		}
+	}
+
 	$: currentLang = $language ?? 'sv';
 	$: t = translations[currentLang];
 	let selectedCard: TarotCardData | null = null;
 	$: translatedKeywords = selectedCard
 		? selectedCard.keywords.map((keyword) =>
-				currentLang === 'en' ? t.keywordMap[keyword] ?? keyword : keyword
+				currentLang === 'en' ? (t.keywordMap[keyword] ?? keyword) : keyword
 			)
 		: [];
 </script>
 
-<div class="deck-header">
-	<button class="back-button" on:click={() => history.back()}>
-		<span aria-hidden="true">←</span>
-		{t.deck.backButton}
-	</button>
+<div on:touchstart={handleTouchStart} on:touchmove={handleTouchMove} on:touchend={handleTouchEnd}>
+	<div class="deck-header">
+		<button class="back-button" on:click={() => history.back()}>
+			<span aria-hidden="true">←</span>
+			{t.deck.backButton}
+		</button>
 
-	<h1>{t.deck.title}</h1>
-</div>
-<p class="wip-note">
-	{t.deck.wipNote}
-</p>
+		<h1>{t.deck.title}</h1>
+	</div>
+	<p class="wip-note">
+		{t.deck.wipNote}
+	</p>
 
-<p class="card-count">{t.deck.cardCount(tarotDeck.length)}</p>
+	<p class="card-count">{t.deck.cardCount(tarotDeck.length)}</p>
 
-{#each sections as section}
-	<section class="deck-section">
-		<h2 class="section-title">{t.deck.sections[section.id]}</h2>
+	{#each sections as section}
+		<section class="deck-section">
+			<h2 class="section-title">{t.deck.sections[section.id]}</h2>
 
-		<div class="deck-grid">
-			{#each tarotDeck.filter( (card) => ('arcana' in section ? card.arcana === section.arcana : card.suit === section.suit) ) as card}
-				<div class="card-item" on:click={() => selectedCard = selectedCard?.id === card.id ? null : card}>
-					<img src={`${base}/tarot/cards/${card.image}`} alt={card.fullTitle} />
-					<div class="card-title">{card.shortName}</div>
+			<div class="deck-grid">
+				{#each tarotDeck.filter( (card) => ('arcana' in section ? card.arcana === section.arcana : card.suit === section.suit) ) as card}
+					<div
+						class="card-item"
+						on:click={() => (selectedCard = selectedCard?.id === card.id ? null : card)}
+					>
+						<img src={`${base}/tarot/cards/${card.image}`} alt={card.fullTitle} />
+						<div class="card-title">{card.shortName}</div>
+					</div>
+				{/each}
+			</div>
+		</section>
+	{/each}
+
+	{#if selectedCard}
+		<div class="modal-overlay" on:click={() => (selectedCard = null)}>
+			<div class="modal" on:click={() => (selectedCard = null)}>
+				<img src={`${base}/tarot/cards/${selectedCard.image}`} alt={selectedCard.fullTitle} />
+				<div class="modal-info">
+					<h2>{selectedCard.fullTitle}</h2>
+					<p>
+						<strong>{t.deck.modal.keywords}:</strong>
+						{translatedKeywords.join(', ')}
+					</p>
+					<p>
+						<strong>{t.deck.modal.element}:</strong>
+						{t.elements[translations.sv.elementMap[selectedCard.element]]}
+					</p>
 				</div>
-			{/each}
-		</div>
-	</section>
-{/each}
-
-{#if selectedCard}
-	<div class="modal-overlay" on:click={() => selectedCard = null}>
-		<div class="modal" on:click={() => selectedCard = null}>
-			<img src={`${base}/tarot/cards/${selectedCard.image}`} alt={selectedCard.fullTitle} />
-			<div class="modal-info">
-				<h2>{selectedCard.fullTitle}</h2>
-				<p>
-					<strong>{t.deck.modal.keywords}:</strong>
-					{translatedKeywords.join(', ')}
-				</p>
-				<p>
-					<strong>{t.deck.modal.element}:</strong>
-					{t.elements[translations.sv.elementMap[selectedCard.element]]}
-				</p>
 			</div>
 		</div>
-	</div>
-{/if}
+	{/if}
+</div>
 
 <style>
 	.deck-header {
@@ -167,44 +192,44 @@
 			justify-self: start;
 		}
 	}
-.modal-overlay {
-	position: fixed;
-	inset: 0;
-	background: rgba(0, 0, 0, 0.6);
-	backdrop-filter: blur(6px);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	z-index: 1000;
-}
-
-.modal {
-	display: grid;
-	grid-template-columns: 300px 1fr;
-	gap: 2rem;
-	background: rgba(20, 20, 30, 0.95);
-	padding: 2rem;
-	border-radius: 16px;
-	max-width: 90vw;
-	max-height: 90vh;
-	overflow-y: auto;
-	box-shadow:
-		0 20px 60px rgba(0, 0, 0, 0.6),
-		0 0 40px rgba(120, 100, 255, 0.2);
-}
-
-.modal img {
-	width: 100%;
-	border-radius: 12px;
-}
-
-.modal-info h2 {
-	margin-top: 0;
-}
-
-@media (max-width: 700px) {
-	.modal {
-		grid-template-columns: 1fr;
+	.modal-overlay {
+		position: fixed;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.6);
+		backdrop-filter: blur(6px);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		z-index: 1000;
 	}
-}
+
+	.modal {
+		display: grid;
+		grid-template-columns: 300px 1fr;
+		gap: 2rem;
+		background: rgba(20, 20, 30, 0.95);
+		padding: 2rem;
+		border-radius: 16px;
+		max-width: 90vw;
+		max-height: 90vh;
+		overflow-y: auto;
+		box-shadow:
+			0 20px 60px rgba(0, 0, 0, 0.6),
+			0 0 40px rgba(120, 100, 255, 0.2);
+	}
+
+	.modal img {
+		width: 100%;
+		border-radius: 12px;
+	}
+
+	.modal-info h2 {
+		margin-top: 0;
+	}
+
+	@media (max-width: 700px) {
+		.modal {
+			grid-template-columns: 1fr;
+		}
+	}
 </style>
