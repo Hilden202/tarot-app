@@ -49,7 +49,6 @@
 	}
 
 	onMount(async () => {
-		void preloadCardBackImage();
 		await tick();
 		void markImageReady();
 	});

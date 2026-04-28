@@ -56,7 +56,14 @@
 	const DECK_PRELOAD_STEP_DELAY_MS = 120;
 
 	onMount(() => {
-		void preloadCardBackImage();
+	// 🔥 prio 1: intro-bilden (det användaren ser först)
+	const veilImg = new Image();
+	veilImg.fetchPriority = 'high';
+	veilImg.decoding = 'sync';
+	veilImg.src = `${base}/tarot/${guideImage}`;
+
+	// 🔥 prio 2: kortens baksida
+	void preloadCardBackImage();
 
 		const startDeckPreload = () => {
 			hasStartedDeckPreload = true;
@@ -333,10 +340,19 @@
 		$tarotSession.flippedIds = new Set<string>();
 		$tarotSession.hasDrawn = false;
 		isDealing = true;
+		// 🔥 stoppa bakgrunds-preload direkt
+		if (deckPreloadTimer) {
+			clearTimeout(deckPreloadTimer);
+			deckPreloadTimer = null;
+		}
+		// 🔥 reset in-flight preload so it does not block draw priority
+		isDeckPreloadInFlight = false;
 		$tarotSession.drawId++;
 		dealtIds = new Set<string>();
 		imageReadyIds = new Set<string>();
 		isReady = false;
+		// 🔥 optional: let deck preload resume from current position after draw
+		// (do NOT reset index to 0, just ensure it continues later cleanly)
 
 		// skapa nytt kort
 		const deckCopy = [...tarotDeck];
@@ -500,7 +516,7 @@
 			{#if !$tarotSession.hasDrawn && !isDealing}
 				<div class="veil-slot">
 					<div class="theVeil">
-						<img src={`${base}/tarot/${guideImage}`} alt="Tarotkort – vägledning" />
+						<img src={`${base}/tarot/${guideImage}`} alt="Tarotkort – vägledning" loading="eager" decoding="sync" />
 					</div>
 				</div>
 			{:else if $tarotSession.selectedCards.length > 0}
