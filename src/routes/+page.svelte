@@ -56,11 +56,6 @@
 	const DECK_PRELOAD_STEP_DELAY_MS = 120;
 
 	onMount(() => {
-	// 🔥 prio 1: intro-bilden (det användaren ser först)
-	const veilImg = new Image();
-	veilImg.fetchPriority = 'high';
-	veilImg.decoding = 'sync';
-	veilImg.src = `${base}/tarot/${guideImage}`;
 
 	// 🔥 prio 2: kortens baksida
 	void preloadCardBackImage();
@@ -525,7 +520,7 @@
 			{#if !$tarotSession.hasDrawn && !isDealing}
 				<div class="veil-slot">
 					<div class="theVeil">
-						<img src={`${base}/tarot/${guideImage}`} alt="Tarotkort – vägledning" loading="eager" decoding="sync" />
+						<img src={`${base}/tarot/${guideImage}`} alt="Tarotkort – vägledning" loading="eager" decoding="async" />
 					</div>
 				</div>
 			{:else if $tarotSession.selectedCards.length > 0}
