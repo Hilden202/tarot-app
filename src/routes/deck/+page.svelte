@@ -242,6 +242,9 @@
 
 	.modal img {
 		width: 100%;
+		height: auto;
+		aspect-ratio: 1024 / 1529;
+		object-fit: contain;
 		border-radius: 12px;
 	}
 
