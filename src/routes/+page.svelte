@@ -131,7 +131,7 @@
 						const img = new Image();
 						let isSettled = false;
 						let hasLoaded = false;
-						img.fetchPriority = 'high';
+						img.fetchPriority = 'auto';
 						img.decoding = 'async';
 
 						const TIMEOUT_MS = 5000;
@@ -370,7 +370,7 @@
 			// lägg i selectedCards
 			returnSelected.push(card);
 		}
-		await preloadCardBackImage();
+		void preloadCardBackImage();
 
 		// Start preloading in parallel (do not block dealing)
 		void preloadCards(returnSelected);
