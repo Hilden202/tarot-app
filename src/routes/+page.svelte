@@ -136,12 +136,13 @@
 					new Promise<void>((resolve) => {
 						const img = new Image();
 						let isSettled = false;
+						let hasLoaded = false;
 						img.fetchPriority = 'high';
 						img.decoding = 'async';
 
-						const TIMEOUT_MS = 3000;
+						const TIMEOUT_MS = 5000;
 						const timeoutId = setTimeout(() => {
-							if (isSettled) return;
+							if (isSettled || hasLoaded) return;
 							isSettled = true;
 							console.warn('Image load timeout, resolving anyway:', card.image);
 							resolve();
@@ -157,6 +158,7 @@
 						};
 
 						img.onload = () => {
+							hasLoaded = true;
 							finalize();
 						};
 						img.onerror = () => {
