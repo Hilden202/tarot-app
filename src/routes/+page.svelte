@@ -133,12 +133,21 @@
 						let hasLoaded = false;
 						img.fetchPriority = 'auto';
 						img.decoding = 'async';
+						let hasRetried = false;
 
 						const TIMEOUT_MS = 5000;
 						const timeoutId = setTimeout(() => {
 							if (isSettled || hasLoaded) return;
+
+							if (!hasRetried) {
+								hasRetried = true;
+								console.warn('Image load timeout, retrying:', card.image);
+								img.src = `${base}/tarot/cards/${card.image}?retry=${Date.now()}`;
+								return;
+							}
+
 							isSettled = true;
-							console.warn('Image load timeout, resolving anyway:', card.image);
+							console.warn('Image load timeout after retry, resolving:', card.image);
 							resolve();
 						}, TIMEOUT_MS);
 
