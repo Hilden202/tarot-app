@@ -56,9 +56,8 @@
 	const DECK_PRELOAD_STEP_DELAY_MS = 120;
 
 	onMount(() => {
-
-	// 🔥 prio 2: kortens baksida
-	void preloadCardBackImage();
+		// Card backs are also preloaded in app.html; this keeps a decoded image ready for JS-driven draws.
+		void preloadCardBackImage();
 
 		const startDeckPreload = () => {
 			hasStartedDeckPreload = true;
@@ -371,8 +370,10 @@
 			// lägg i selectedCards
 			returnSelected.push(card);
 		}
+		await preloadCardBackImage();
+
 		// Start preloading in parallel (do not block dealing)
-		preloadCards(returnSelected);
+		void preloadCards(returnSelected);
 
 		for (const card of returnSelected) {
 			$tarotSession.selectedCards = [...$tarotSession.selectedCards, card];
