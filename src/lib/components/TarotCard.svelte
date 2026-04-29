@@ -10,6 +10,7 @@
 	export let onFlipChange: (payload: { id: string; isFlipped: boolean }) => void = () => {};
 	export let isReady = false;
 	export let isFlipped = false;
+	export let shouldAnimateDeal = false;
 
 	const dispatch = createEventDispatcher<{
 		dealt: { id: string };
@@ -60,6 +61,7 @@
 	class:nonInteractive={!isInteractive}
 	class:imageReady={isImageReady}
 	class:ready={isReady}
+	class:animateDeal={shouldAnimateDeal}
 	on:click={flipCard}
 	on:animationend={handleAnimationEnd}
 >
@@ -80,9 +82,6 @@
 		/>
 	</div>
 
-	<div class="prewarmLayer" aria-hidden="true">
-		<img src={`${base}/tarot/cards/${card.image}`} alt="" loading="eager" decoding="sync" />
-	</div>
 </button>
 
 <style lang="scss">
@@ -152,20 +151,6 @@
 		object-fit: cover;
 	}
 
-	.prewarmLayer {
-		position: absolute;
-		inset: 0;
-		opacity: 0;
-		pointer-events: none;
-		z-index: -1;
-	}
-
-	.prewarmLayer img {
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
-	}
-
 	.card {
 		transition:
 			transform 0.25s ease,
@@ -177,7 +162,7 @@
 		filter: brightness(0.95);
 	}
 
-	.card {
+	.card.animateDeal {
 		animation: dealIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 	}
 

@@ -71,7 +71,14 @@
 						class="card-item"
 						on:click={() => (selectedCard = selectedCard?.id === card.id ? null : card)}
 					>
-						<img src={`${base}/tarot/cards/${card.image}`} alt={card.fullTitle} />
+						<img
+							src={`${base}/tarot/cards/${card.image}`}
+							alt={card.fullTitle}
+							loading="lazy"
+							decoding="async"
+							width="1024"
+							height="1529"
+						/>
 						<div class="card-title">{card.shortName}</div>
 					</div>
 				{/each}
@@ -82,7 +89,14 @@
 	{#if selectedCard}
 		<div class="modal-overlay" on:click={() => (selectedCard = null)}>
 			<div class="modal" on:click={() => (selectedCard = null)}>
-				<img src={`${base}/tarot/cards/${selectedCard.image}`} alt={selectedCard.fullTitle} />
+				<img
+					src={`${base}/tarot/cards/${selectedCard.image}`}
+					alt={selectedCard.fullTitle}
+					loading="lazy"
+					decoding="async"
+					width="1024"
+					height="1529"
+				/>
 				<div class="modal-info">
 					<h2>{selectedCard.fullTitle}</h2>
 					<p>
@@ -143,6 +157,8 @@
 
 	.deck-section {
 		margin-top: 2.5rem;
+		content-visibility: auto;
+		contain-intrinsic-size: 900px;
 	}
 
 	.section-title {

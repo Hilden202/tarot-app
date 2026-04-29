@@ -540,6 +540,7 @@
 						isFlipped={$tarotSession.flippedIds.has(card.id)}
 						isInteractive={imageReadyIds.has(card.id)}
 						{isReady}
+						shouldAnimateDeal={isDealing}
 						onFlipChange={handleFlipChange}
 						on:dealt={handleCardDealt}
 						on:imageready={handleCardImageReady}
