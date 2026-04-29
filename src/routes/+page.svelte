@@ -139,10 +139,19 @@
 						img.fetchPriority = 'high';
 						img.decoding = 'async';
 
+						const TIMEOUT_MS = 3000;
+						const timeoutId = setTimeout(() => {
+							if (isSettled) return;
+							isSettled = true;
+							console.warn('Image load timeout, resolving anyway:', card.image);
+							resolve();
+						}, TIMEOUT_MS);
+
 						const finalize = () => {
 							if (isSettled) return;
 							isSettled = true;
 
+							clearTimeout(timeoutId);
 							void img.decode().catch(() => {});
 							resolve();
 						};
