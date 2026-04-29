@@ -142,7 +142,7 @@
 							if (!hasRetried) {
 								hasRetried = true;
 								console.warn('Image load timeout, retrying:', card.image);
-								img.src = `${base}/tarot/cards/${card.image}?retry=${Date.now()}`;
+								img.src = `${base}/tarot/cards/${card.image}`;
 								return;
 							}
 
@@ -530,7 +530,14 @@
 			{#if !$tarotSession.hasDrawn && !isDealing}
 				<div class="veil-slot">
 					<div class="theVeil">
-						<img src={`${base}/tarot/${guideImage}`} alt="Tarotkort – vägledning" loading="eager" decoding="async" />
+						<img
+							src={`${base}/tarot/${guideImage}`}
+							alt="Tarotkort – vägledning"
+							loading="eager"
+							decoding="async"
+							width="1024"
+							height="1529"
+						/>
 					</div>
 				</div>
 			{:else if $tarotSession.selectedCards.length > 0}

@@ -67,7 +67,14 @@
 >
 	<!-- Baksida -->
 	<div class="backCard">
-		<img src={cardBackImageSrc} alt="Tarotkort – baksida" loading="eager" decoding="sync" />
+		<img
+			src={cardBackImageSrc}
+			alt="Tarotkort – baksida"
+			loading="eager"
+			decoding="async"
+			width="1024"
+			height="1529"
+		/>
 	</div>
 
 	<!-- Framsida -->
@@ -77,7 +84,9 @@
 			src={`${base}/tarot/cards/${card.image}`}
 			alt={card.fullTitle}
 			loading="eager"
-			decoding="sync"
+			decoding="async"
+			width="1024"
+			height="1529"
 			on:load={markImageReady}
 		/>
 	</div>

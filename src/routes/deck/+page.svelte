@@ -74,7 +74,7 @@
 						<img
 							src={`${base}/tarot/cards/${card.image}`}
 							alt={card.fullTitle}
-							loading="lazy"
+							loading="eager"
 							decoding="async"
 							width="1024"
 							height="1529"
@@ -92,7 +92,7 @@
 				<img
 					src={`${base}/tarot/cards/${selectedCard.image}`}
 					alt={selectedCard.fullTitle}
-					loading="lazy"
+					loading="eager"
 					decoding="async"
 					width="1024"
 					height="1529"
