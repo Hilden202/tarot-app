@@ -137,20 +137,18 @@
 						const img = new Image();
 						let isSettled = false;
 						img.fetchPriority = 'high';
-						img.decoding = 'sync';
+						img.decoding = 'async';
 
-						const finalize = async () => {
+						const finalize = () => {
 							if (isSettled) return;
 							isSettled = true;
 
-							try {
-								await img.decode();
-							} catch {}
+							void img.decode().catch(() => {});
 							resolve();
 						};
 
 						img.onload = () => {
-							void finalize();
+							finalize();
 						};
 						img.onerror = () => {
 							if (isSettled) return;
@@ -160,7 +158,7 @@
 						img.src = `${base}/tarot/cards/${card.image}`;
 
 						if (img.complete) {
-							void finalize();
+							finalize();
 						}
 					})
 			)
@@ -286,7 +284,7 @@
 	}
 
 	function handleFlipChange(payload: { id: string; isFlipped: boolean }) {
-		if (!isReady || isDealing) return;
+		if (!imageReadyIds.has(payload.id)) return;
 
 		const next = new Set($tarotSession.flippedIds);
 
@@ -524,7 +522,7 @@
 					<TarotCard
 						{card}
 						isFlipped={$tarotSession.flippedIds.has(card.id)}
-						isInteractive={isReady}
+						isInteractive={imageReadyIds.has(card.id)}
 						{isReady}
 						onFlipChange={handleFlipChange}
 						on:dealt={handleCardDealt}
