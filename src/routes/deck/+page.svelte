@@ -190,6 +190,9 @@
 
 	.card-item img {
 		width: 100%;
+		height: auto;
+		aspect-ratio: 1024 / 1529;
+		object-fit: cover;
 		border-radius: 10px;
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 	}
