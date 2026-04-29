@@ -534,7 +534,7 @@
 					</div>
 				</div>
 			{:else if $tarotSession.selectedCards.length > 0}
-				{#each $tarotSession.selectedCards as card (`${$tarotSession.drawId}-${card.id}`)}
+				{#each $tarotSession.selectedCards as card (card.id)}
 					<TarotCard
 						{card}
 						isFlipped={$tarotSession.flippedIds.has(card.id)}
