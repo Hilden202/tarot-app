@@ -3,6 +3,10 @@ export type Lang = 'sv' | 'en';
 type ElementKey = 'fire' | 'water' | 'earth' | 'air';
 
 type TranslationSchema = {
+	layout: {
+		localStorageNotice: string;
+	};
+
 	page: {
 		title: string;
 		intro: string;
@@ -88,6 +92,9 @@ type TranslationSchema = {
 
 export const translations: Record<Lang, TranslationSchema> = {
 	sv: {
+		layout: {
+			localStorageNotice: 'Den här appen använder lokal lagring för att fungera korrekt.'
+		},
 		page: {
 			title: 'Tarotläggning',
 			intro:
@@ -200,6 +207,9 @@ Fokusera på det övergripande temat, hur korten samspelar och vilken väglednin
 	},
 
 	en: {
+		layout: {
+			localStorageNotice: 'This app uses local storage to function properly.'
+		},
 		page: {
 			title: 'Tarot Reading',
 			intro:
