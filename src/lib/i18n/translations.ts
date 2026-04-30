@@ -114,7 +114,7 @@ export const translations: Record<Lang, TranslationSchema> = {
 		},
 		deck: {
 			title: 'Kortlek',
-			wipNote: 'Denna sida är under utveckling. Vissa funktioner och översättningar saknas.',
+			wipNote: 'Kortleken är fortfarande under utveckling, men du kan redan utforska korten och deras betydelser.',
 			cardCount: (count: number) => `Antal kort: ${count}`,
 			backButton: 'Tillbaka',
 			modal: {
@@ -229,7 +229,7 @@ Fokusera på det övergripande temat, hur korten samspelar och vilken väglednin
 		},
 		deck: {
 			title: 'Deck',
-			wipNote: 'This page is under development. Some features and translations are missing.',
+			wipNote: 'The deck is still evolving, but you can already explore the cards and their meanings.',
 			cardCount: (count: number) => `Number of cards: ${count}`,
 			backButton: 'Back',
 			modal: {
