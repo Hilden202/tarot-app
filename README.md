@@ -1,3 +1,14 @@
+<!-- Tarot banner -->
+<div align="center">
+  <a href="https://tarot.hildenmedia.se" target="_blank">
+    <img
+      height="220"
+      src="https://raw.githubusercontent.com/Hilden202/HildenMedia/main/images/tarot-banner.png"
+      alt="Tarot app – AI svar"
+    />
+  </a>
+</div>
+
 # Tarot App
 
 Live: https://tarot.hildenmedia.se
